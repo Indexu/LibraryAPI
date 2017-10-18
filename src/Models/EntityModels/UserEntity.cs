@@ -50,16 +50,5 @@ namespace LibraryAPI.Models.EntityModels
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-
-        /// <summary>
-        /// The phone number of the user
-        /// </summary>
-        /// <value>
-        /// The Phone property is the string value of the user's phone number
-        /// <para />
-        /// Example: 5812345
-        /// </value>
-        [RegularExpression("^[0-9]*$")]
-        public string Phone { get; set; }
     }
 }

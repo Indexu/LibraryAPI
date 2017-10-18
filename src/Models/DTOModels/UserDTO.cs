@@ -44,15 +44,5 @@
         /// Example: johndoe@email.com
         /// </value>
         public string Email { get; set; }
-
-        /// <summary>
-        /// The phone number of the user
-        /// </summary>
-        /// <value>
-        /// The Phone property is the string value of the user's phone number
-        /// <para />
-        /// Example: 5812345
-        /// </value>
-        public string Phone { get; set; }
     }
 }

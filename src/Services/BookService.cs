@@ -13,11 +13,13 @@ namespace LibraryAPI.Services
     public class BookService : IBookService
     {
         private readonly IBookRepository bookRepository;
+        private readonly ILoanRepository loanRepository;
         private readonly IMapper mapper;
 
-        public BookService(IBookRepository bookRepository, IMapper mapper)
+        public BookService(IBookRepository bookRepository, ILoanRepository loanRepository, IMapper mapper)
         {
             this.bookRepository = bookRepository;
+            this.loanRepository = loanRepository;
             this.mapper = mapper;
         }
 
@@ -26,6 +28,18 @@ namespace LibraryAPI.Services
             try
             {
                 return bookRepository.GetBooks(pageNumber, pageMaxSize);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public Envelope<UserLoanDTO> GetBooksInLoanByUserID(int userID, int pageNumber, int? pageMaxSize)
+        {
+            try
+            {
+                return loanRepository.GetLoansByUserID(userID, true, pageNumber, pageMaxSize);
             }
             catch (Exception ex)
             {
@@ -50,6 +64,56 @@ namespace LibraryAPI.Services
             try
             {
                 return bookRepository.AddBook(book);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int AddLoan(int userID, int bookID)
+        {
+            try
+            {
+                return loanRepository.AddLoan(userID, bookID);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void UpdateLoan(int userID, int bookID, PatchLoanViewModel loan)
+        {
+            try
+            {
+                loanRepository.UpdateLoan(userID, bookID, loan);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void ReplaceLoan(int userID, int bookID, LoanViewModel loan)
+        {
+            try
+            {
+                var mappedLoan = mapper.Map<LoanViewModel, PatchLoanViewModel>(loan);
+
+                loanRepository.UpdateLoan(userID, bookID, mappedLoan);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void ReturnBook(int userID, int bookID)
+        {
+            try
+            {
+                loanRepository.ReturnBook(userID, bookID);
             }
             catch (Exception ex)
             {

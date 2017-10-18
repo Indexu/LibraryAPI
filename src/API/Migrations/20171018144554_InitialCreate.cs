@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace API.Migrations
 {
-    public partial class initialCreate : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,8 +32,7 @@ namespace API.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Address = table.Column<string>(type: "TEXT", nullable: true),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", nullable: true)
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -69,7 +68,7 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Ratings",
+                name: "Reviews",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
@@ -80,15 +79,15 @@ namespace API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Ratings", x => x.ID);
+                    table.PrimaryKey("PK_Reviews", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Ratings_Books_BookID",
+                        name: "FK_Reviews_Books_BookID",
                         column: x => x.BookID,
                         principalTable: "Books",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Ratings_Users_UserID",
+                        name: "FK_Reviews_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "ID",
@@ -106,13 +105,13 @@ namespace API.Migrations
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ratings_BookID",
-                table: "Ratings",
+                name: "IX_Reviews_BookID",
+                table: "Reviews",
                 column: "BookID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ratings_UserID",
-                table: "Ratings",
+                name: "IX_Reviews_UserID",
+                table: "Reviews",
                 column: "UserID");
         }
 
@@ -122,7 +121,7 @@ namespace API.Migrations
                 name: "Loans");
 
             migrationBuilder.DropTable(
-                name: "Ratings");
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "Books");

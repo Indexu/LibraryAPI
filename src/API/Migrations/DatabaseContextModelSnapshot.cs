@@ -62,7 +62,7 @@ namespace API.Migrations
                     b.ToTable("Loans");
                 });
 
-            modelBuilder.Entity("LibraryAPI.Models.EntityModels.RatingEntity", b =>
+            modelBuilder.Entity("LibraryAPI.Models.EntityModels.ReviewEntity", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
@@ -79,7 +79,7 @@ namespace API.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("LibraryAPI.Models.EntityModels.UserEntity", b =>
@@ -94,8 +94,6 @@ namespace API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired();
-
-                    b.Property<string>("Phone");
 
                     b.HasKey("ID");
 
@@ -115,7 +113,7 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("LibraryAPI.Models.EntityModels.RatingEntity", b =>
+            modelBuilder.Entity("LibraryAPI.Models.EntityModels.ReviewEntity", b =>
                 {
                     b.HasOne("LibraryAPI.Models.EntityModels.BookEntity", "Book")
                         .WithMany()

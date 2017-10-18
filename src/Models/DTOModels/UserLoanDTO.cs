@@ -8,16 +8,6 @@ namespace LibraryAPI.Models.DTOModels
     public class UserLoanDTO
     {
         /// <summary>
-        /// The ID of the book
-        /// </summary>
-        /// <value>
-        /// The ID property is the integer value of the loan ID in the database
-        /// <para />
-        /// Example: 3
-        /// </value>
-        public int ID { get; set; }
-
-        /// <summary>
         /// The loaned book
         /// </summary>
         /// <value>
@@ -31,8 +21,18 @@ namespace LibraryAPI.Models.DTOModels
         /// <value>
         /// The LoanDate property is the DateTime value of when the book was loaned
         /// <para />
-        /// Example: johndoe@email.com
+        /// Example: 2017-09-22
         /// </value>
         public DateTime LoanDate { get; set; }
+
+        /// <summary>
+        /// When the book was returned, if it has been returned
+        /// </summary>
+        /// <value>
+        /// The ReturnDate property is the DateTime value of when the return date of the loaned book
+        /// <para />
+        /// Example: 2017-09-25
+        /// </value>
+        public DateTime? ReturnDate { get; set; }
     }
 }

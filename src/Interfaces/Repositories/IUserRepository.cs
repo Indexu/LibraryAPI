@@ -25,8 +25,10 @@ namespace LibraryAPI.Interfaces.Repositories
         /// </summary>
         /// <param name="userID">The ID of the user</param>
         /// <para />
+        /// <param name="loanHistory">Whether or not the loan history should be populated</param>
+        /// <para />
         /// <returns>An UserDetailsDTO</returns>
-        UserDetailsDTO GetUserByID(int userID);
+        UserDetailsDTO GetUserByID(int userID, bool loanHistory, int pageNumber, int? pageMaxSize);
 
         /// <summary>
         /// Add a user

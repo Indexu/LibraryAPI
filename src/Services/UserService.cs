@@ -33,11 +33,11 @@ namespace LibraryAPI.Services
             }
         }
 
-        public UserDetailsDTO GetUserByID(int userID)
+        public UserDetailsDTO GetUserByID(int userID, int pageNumber, int? pageMaxSize)
         {
             try
             {
-                return userRepository.GetUserByID(userID);
+                return userRepository.GetUserByID(userID, true, pageNumber, pageMaxSize);
             }
             catch (Exception ex)
             {
@@ -73,7 +73,7 @@ namespace LibraryAPI.Services
         {
             try
             {
-                var oldUser = userRepository.GetUserByID(userID);
+                var oldUser = userRepository.GetUserByID(userID, false, 0, 0);
 
                 MergeUsersForPatch(user, oldUser);
 
@@ -114,11 +114,6 @@ namespace LibraryAPI.Services
             if (string.IsNullOrEmpty(user.Email))
             {
                 user.Email = oldUser.Email;
-            }
-
-            if (string.IsNullOrEmpty(user.Phone))
-            {
-                user.Phone = oldUser.Phone;
             }
         }
     }

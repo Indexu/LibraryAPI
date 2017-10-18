@@ -11,8 +11,8 @@ using System;
 namespace API.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20170924195805_initialCreate")]
-    partial class initialCreate
+    [Migration("20171018144554_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -63,7 +63,7 @@ namespace API.Migrations
                     b.ToTable("Loans");
                 });
 
-            modelBuilder.Entity("LibraryAPI.Models.EntityModels.RatingEntity", b =>
+            modelBuilder.Entity("LibraryAPI.Models.EntityModels.ReviewEntity", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
@@ -80,7 +80,7 @@ namespace API.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("LibraryAPI.Models.EntityModels.UserEntity", b =>
@@ -95,8 +95,6 @@ namespace API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired();
-
-                    b.Property<string>("Phone");
 
                     b.HasKey("ID");
 
@@ -116,7 +114,7 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("LibraryAPI.Models.EntityModels.RatingEntity", b =>
+            modelBuilder.Entity("LibraryAPI.Models.EntityModels.ReviewEntity", b =>
                 {
                     b.HasOne("LibraryAPI.Models.EntityModels.BookEntity", "Book")
                         .WithMany()

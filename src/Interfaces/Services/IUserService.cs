@@ -25,8 +25,12 @@ namespace LibraryAPI.Interfaces.Services
         /// </summary>
         /// <param name="userID">The ID of the user</param>
         /// <para />
+        /// <param name="pageNumber">The page number of the paging of loan history</param>
+        /// <para />
+        /// <param name="pageMaxSize">The maximum items on a single page of loan history</param>
+        /// <para />
         /// <returns>An UserDetailsDTO</returns>
-        UserDetailsDTO GetUserByID(int userID);
+        UserDetailsDTO GetUserByID(int userID, int pageNumber, int? pageMaxSize);
 
         /// <summary>
         /// Add a user

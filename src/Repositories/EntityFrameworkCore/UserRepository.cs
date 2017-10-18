@@ -35,7 +35,11 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             var totalNumberOfItems = db.Users.Count();
             var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
 
-            var userEntites = db.Users.Skip((pageNumber - 1) * maxSize).Take(maxSize).ToList();
+            var userEntites = db.Users
+                                .OrderBy(u => u.ID)
+                                .Skip((pageNumber - 1) * maxSize)
+                                .Take(maxSize)
+                                .ToList();
 
             var userDTOs = Mapper.Map<IList<UserEntity>, IList<UserDTO>>(userEntites);
 
@@ -53,7 +57,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             };
         }
 
-        public UserDetailsDTO GetUserByID(int userID)
+        public UserDetailsDTO GetUserByID(int userID, bool loanHistory, int pageNumber, int? pageMaxSize)
         {
             var userEntity = db.Users.Where(u => u.ID == userID).SingleOrDefault();
 
@@ -64,11 +68,12 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             var userDetailsDTO = mapper.Map<UserEntity, UserDetailsDTO>(userEntity);
 
-            var currentLoans = loanRepository.GetCurrentLoans(userID);
+            if (loanHistory)
+            {
+                var history = loanRepository.GetLoansByUserID(userID, false, pageNumber, pageMaxSize);
 
-            var currentUserLoans = mapper.Map<IEnumerable<LoanDTO>, IEnumerable<UserLoanDTO>>(currentLoans);
-
-            userDetailsDTO.CurrentLoans = currentUserLoans;
+                userDetailsDTO.LoanHistory = history;
+            }
 
             return userDetailsDTO;
         }
@@ -108,7 +113,6 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             userEntity.Name = user.Name;
             userEntity.Address = user.Address;
-            userEntity.Phone = user.Phone;
             userEntity.Email = user.Email;
 
             db.Users.Update(userEntity);
@@ -141,7 +145,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // how I got the data into the database.
 
             db.Database.ExecuteSqlCommand("DELETE FROM Loans;DELETE FROM sqlite_sequence WHERE name='Loans';");
-            db.Database.ExecuteSqlCommand("DELETE FROM Ratings;DELETE FROM sqlite_sequence WHERE name='Ratings';");
+            db.Database.ExecuteSqlCommand("DELETE FROM Reviews;DELETE FROM sqlite_sequence WHERE name='Reviews';");
             db.Database.ExecuteSqlCommand("DELETE FROM Books;DELETE FROM sqlite_sequence WHERE name='Books';");
             db.Database.ExecuteSqlCommand("DELETE FROM Users;DELETE FROM sqlite_sequence WHERE name='Users';");
 

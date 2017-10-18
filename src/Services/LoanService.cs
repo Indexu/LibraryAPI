@@ -101,25 +101,25 @@ namespace LibraryAPI.Services
 
         private void MergeLoansForPatch(PatchLoanViewModel loan, LoanDTO oldLoan)
         {
-            if (loan.BookID.HasValue)
-            {
-                loan.BookID = oldLoan.Book.ID;
-            }
+            // if (loan.BookID.HasValue)
+            // {
+            //     loan.BookID = oldLoan.Book.ID;
+            // }
 
-            if (loan.UserID.HasValue)
-            {
-                loan.UserID = oldLoan.User.ID;
-            }
+            // if (loan.UserID.HasValue)
+            // {
+            //     loan.UserID = oldLoan.User.ID;
+            // }
 
-            if (loan.LoanDate.HasValue)
-            {
-                loan.LoanDate = oldLoan.LoanDate;
-            }
+            // if (loan.LoanDate.HasValue)
+            // {
+            //     loan.LoanDate = oldLoan.LoanDate;
+            // }
 
-            if (loan.ReturnDate.HasValue)
-            {
-                loan.ReturnDate = oldLoan.ReturnDate;
-            }
+            // if (loan.ReturnDate.HasValue)
+            // {
+            //     loan.ReturnDate = oldLoan.ReturnDate;
+            // }
         }
     }
 }

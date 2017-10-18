@@ -31,6 +31,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             var query = db.Loans
                         .Include(l => l.Book)
                         .Include(l => l.User)
+                        .OrderBy(l => l.ID)
                         .Select(l => l);
 
             // Filter by user
@@ -96,25 +97,37 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             }; ;
         }
 
-        public IEnumerable<LoanDTO> GetCurrentLoans(int? userID)
+        public Envelope<UserLoanDTO> GetLoansByUserID(int userID, bool active, int pageNumber, int? pageMaxSize)
         {
             var query = db.Loans
                         .Include(l => l.Book)
-                        .Include(l => l.User)
-                        .Where(l => !l.ReturnDate.HasValue)
-                        .Select(l => l);
+                        .Where(l => l.UserID == userID && (active ? l.ReturnDate == null : true))
+                        .OrderByDescending(l => l.LoanDate);
 
-            // Filter by user
-            if (userID.HasValue)
+            var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
+            var totalNumberOfItems = query.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var loanEntities = query
+                                .Select(l => l)
+                                .Skip((pageNumber - 1) * maxSize)
+                                .Take(maxSize)
+                                .ToList();
+
+            var userLoansDTO = Mapper.Map<IList<LoanEntity>, IList<UserLoanDTO>>(loanEntities);
+
+            return new Envelope<UserLoanDTO>
             {
-                query = query.Where(l => l.UserID == userID.Value);
-            }
-
-            var loanEntities = query.ToList();
-
-            var loanDTOs = Mapper.Map<IList<LoanEntity>, IList<LoanDTO>>(loanEntities);
-
-            return loanDTOs;
+                Items = userLoansDTO,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = userLoansDTO.Count,
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
         }
 
         public LoanDTO GetLoanByID(int loanID)
@@ -135,6 +148,71 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             return loanDTO;
         }
 
+        public int AddLoan(int userID, int bookID)
+        {
+            // Check if user exists
+            if (!db.Users.Where(u => u.ID == userID).Any())
+            {
+                throw new NotFoundException("User not found");
+            }
+
+            // Check if book exists
+            if (!db.Books.Where(b => b.ID == bookID).Any())
+            {
+                throw new NotFoundException("Book not found");
+            }
+
+            // Check if user already has book loaned
+            if (db.Loans.Where(l => l.BookID == bookID && l.UserID == userID && l.ReturnDate == null).Any())
+            {
+                throw new AlreadyExistsException("User already has book loaned");
+            }
+
+            var loanEntity = new LoanEntity
+            {
+                UserID = userID,
+                BookID = bookID,
+                LoanDate = DateTime.Now,
+                ReturnDate = null
+            };
+
+            // Add loan
+            db.Loans.Add(loanEntity);
+            db.SaveChanges();
+
+            return loanEntity.ID;
+        }
+
+        public void ReturnBook(int userID, int bookID)
+        {
+            // Check if user exists
+            if (!db.Users.Where(u => u.ID == userID).Any())
+            {
+                throw new NotFoundException("User not found");
+            }
+
+            // Check if book exists
+            if (!db.Books.Where(b => b.ID == bookID).Any())
+            {
+                throw new NotFoundException("Book not found");
+            }
+
+            var loanEntity = db.Loans
+                                .Where(l => l.BookID == bookID && l.UserID == userID && l.ReturnDate == null)
+                                .SingleOrDefault();
+
+            // Check if user already has book loaned
+            if (loanEntity == null)
+            {
+                throw new NotFoundException("User does not have the book loaned");
+            }
+
+            loanEntity.ReturnDate = DateTime.Now;
+
+            db.Loans.Update(loanEntity);
+            db.SaveChanges();
+        }
+
         public int AddLoan(LoanViewModel loan)
         {
             var loanEntity = mapper.Map<LoanViewModel, LoanEntity>(loan);
@@ -145,17 +223,17 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
                 throw new InvalidDataException(dateNonsenseMessage);
             }
 
-            // Check if user exists
-            if (!db.Users.Where(u => u.ID == loan.UserID).Any())
-            {
-                throw new NotFoundException("User not found");
-            }
+            // // Check if user exists
+            // if (!db.Users.Where(u => u.ID == loan.UserID).Any())
+            // {
+            //     throw new NotFoundException("User not found");
+            // }
 
-            // Check if book exists
-            if (!db.Books.Where(b => b.ID == loan.BookID).Any())
-            {
-                throw new NotFoundException("Book not found");
-            }
+            // // Check if book exists
+            // if (!db.Books.Where(b => b.ID == loan.BookID).Any())
+            // {
+            //     throw new NotFoundException("Book not found");
+            // }
 
             // Add loan
             db.Loans.Add(loanEntity);
@@ -166,39 +244,54 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
         public void UpdateLoan(int loanID, LoanViewModel loan)
         {
-            // Get entity from database
-            var loanEntity = db.Loans.Where(l => l.ID == loanID).SingleOrDefault();
+            throw new NotImplementedException();
+        }
 
-            if (loanEntity == null)
-            {
-                throw new NotFoundException(notFoundMessage);
-            }
-
-            // Map for the check date integrity
-            var mappedLoan = mapper.Map<LoanViewModel, LoanEntity>(loan);
-
+        public void UpdateLoan(int userID, int bookID, PatchLoanViewModel loan)
+        {
             // Check if user exists
-            if (!db.Users.Where(u => u.ID == mappedLoan.UserID).Any())
+            if (!db.Users.Where(u => u.ID == userID).Any())
             {
                 throw new NotFoundException("User not found");
             }
 
             // Check if book exists
-            if (!db.Books.Where(b => b.ID == mappedLoan.BookID).Any())
+            if (!db.Books.Where(b => b.ID == bookID).Any())
             {
                 throw new NotFoundException("Book not found");
             }
 
-            // Check if loan date is before return date
-            if (loan.ReturnDate.HasValue && loan.ReturnDate.Value < loan.LoanDate)
+            // Get entity from database
+            var loanEntity = db.Loans
+                                .Where(l => l.UserID == userID && l.BookID == bookID && l.ReturnDate == null)
+                                .SingleOrDefault();
+
+            if (loanEntity == null)
             {
-                throw new InvalidDataException(dateNonsenseMessage);
+                throw new NotFoundException("User does not have the book loaned");
             }
 
-            loanEntity.BookID = mappedLoan.BookID;
-            loanEntity.UserID = mappedLoan.UserID;
-            loanEntity.LoanDate = mappedLoan.LoanDate;
-            loanEntity.ReturnDate = mappedLoan.ReturnDate;
+            // Check if loan date is before return date
+            if (loan.ReturnDate.HasValue)
+            {
+                if ((loan.LoanDate.HasValue && loan.ReturnDate.Value < loan.LoanDate.Value) ||
+                    (!loan.LoanDate.HasValue && loan.ReturnDate.Value < loanEntity.LoanDate))
+                {
+                    throw new InvalidDataException(dateNonsenseMessage);
+                }
+            }
+
+            // Loan date
+            if (loan.LoanDate.HasValue)
+            {
+                loanEntity.LoanDate = loan.LoanDate.Value;
+            }
+
+            // Return date
+            if (loan.ReturnDate.HasValue)
+            {
+                loanEntity.ReturnDate = loan.ReturnDate.Value;
+            }
 
             db.Loans.Update(loanEntity);
             db.SaveChanges();

@@ -32,12 +32,18 @@ namespace LibraryAPI.Interfaces.Repositories
         Envelope<LoanDTO> GetLoans(int pageNumber, int? pageMaxSize, int? userID, int? bookID, DateTime? date, bool? monthSpan);
 
         /// <summary>
-        /// Get all loans that are currently ongoing
+        /// Get all books in loan by user
         /// </summary>
-        /// <param name="userID">Filter by user ID</param>
+        /// <param name="userID">The ID of the user</param>
         /// <para />
-        /// <returns>An IEnumerable of LoanDTO</returns>
-        IEnumerable<LoanDTO> GetCurrentLoans(int? userID);
+        /// <param name="active">Whether or not the loans must be currently active</param>
+        /// <para />
+        /// <param name="pageNumber">The page number of the paging</param>
+        /// <para />
+        /// <param name="pageMaxSize">The maximum items on a single page</param>
+        /// <para />
+        /// <returns>An Envelope of UserLoanDTO</returns>
+        Envelope<UserLoanDTO> GetLoansByUserID(int userID, bool active, int pageNumber, int? pageMaxSize);
 
         /// <summary>
         /// Get a loan by loan ID
@@ -46,6 +52,40 @@ namespace LibraryAPI.Interfaces.Repositories
         /// <para />
         /// <returns>A LoanDTO</returns>
         LoanDTO GetLoanByID(int loanID);
+
+        /// <summary>
+        /// Add a loan
+        /// </summary>
+        /// <param name="userID">The ID of the user</param>
+        /// <para />
+        /// <param name="bookID">The ID of the book</param>
+        /// <para />
+        /// <returns>An integer representing the ID of the added loan</returns>
+        int AddLoan(int userID, int bookID);
+
+        /// <summary>
+        /// Return a book
+        /// </summary>
+        /// <param name="userID">The ID of the user</param>
+        /// <para />
+        /// <param name="bookID">The ID of the book</param>
+        /// <para />
+        /// <returns>Nothing</returns>
+        void ReturnBook(int userID, int bookID);
+
+        /// <summary>
+        /// Update some (or all) of a loan's information
+        /// </summary>
+        /// <param name="userID">The ID of the user</param>
+        /// <para />
+        /// <param name="bookID">The ID of the book</param>
+        /// <para />
+        /// <param name="loan">The PatchLoanViewModel containing new loan information</param>
+        /// <para />
+        /// <returns>void</returns>
+        void UpdateLoan(int userID, int bookID, PatchLoanViewModel loan);
+
+        // ===================================================================
 
         /// <summary>
         /// Add a loan

@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace LibraryAPI.Models.EntityModels
 {
     /// <summary>
-    /// An entity class for a rating entry in the database
+    /// An entity class for a review entry in the database
     /// </summary>
-    public class RatingEntity
+    public class ReviewEntity
     {
         /// <summary>
         /// The ID of the rating

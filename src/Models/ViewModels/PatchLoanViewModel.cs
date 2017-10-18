@@ -9,26 +9,6 @@ namespace LibraryAPI.Models.ViewModels
     public class PatchLoanViewModel
     {
         /// <summary>
-        /// The ID of the user
-        /// </summary>
-        /// <value>
-        /// The UserID property is the integer value of what user has a book loaned
-        /// <para />
-        /// Example: 24
-        /// </value>
-        public int? UserID { get; set; }
-
-        /// <summary>
-        /// The ID of the book
-        /// </summary>
-        /// <value>
-        /// The BookID property is the integer value of what book is loaned
-        /// <para />
-        /// Example: 55
-        /// </value>
-        public int? BookID { get; set; }
-
-        /// <summary>
         /// When the book was loaned
         /// </summary>
         /// <value>

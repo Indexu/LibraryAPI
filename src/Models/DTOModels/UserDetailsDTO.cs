@@ -49,21 +49,11 @@ namespace LibraryAPI.Models.DTOModels
         public string Email { get; set; }
 
         /// <summary>
-        /// The phone number of the user
+        /// The loan history of the user
         /// </summary>
         /// <value>
-        /// The Phone property is the string value of the user's phone number
-        /// <para />
-        /// Example: 5812345
+        /// The LoanHistory property is the Envelope value of the books the user has loaned
         /// </value>
-        public string Phone { get; set; }
-
-        /// <summary>
-        /// The books the user has right now
-        /// </summary>
-        /// <value>
-        /// The CurrentLoans property is the IEnumerable value of the books the user has right now
-        /// </value>
-        public IEnumerable<UserLoanDTO> CurrentLoans { get; set; }
+        public Envelope<UserLoanDTO> LoanHistory { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using LibraryAPI.Models.ViewModels;
 using LibraryAPI.Models.EntityModels;
 using LibraryAPI.Models;
 using LibraryAPI.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using System;
 

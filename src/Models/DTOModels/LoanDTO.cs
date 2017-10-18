@@ -39,7 +39,7 @@ namespace LibraryAPI.Models.DTOModels
         /// <value>
         /// The LoanDate property is the DateTime value of when the book was loaned
         /// <para />
-        /// Example: johndoe@email.com
+        /// Example: 2017-09-22
         /// </value>
         public DateTime LoanDate { get; set; }
 
@@ -49,7 +49,7 @@ namespace LibraryAPI.Models.DTOModels
         /// <value>
         /// The ReturnDate property is the DateTime value of when the return date of the loaned book
         /// <para />
-        /// Example: 428449649-2
+        /// Example: 2017-09-25
         /// </value>
         public DateTime? ReturnDate { get; set; }
     }

@@ -17,13 +17,21 @@ namespace LibraryAPI.API.Controllers
     public class UsersController : Controller
     {
         private readonly IUserService userService;
+        private readonly IBookService bookService;
         private readonly IMapper mapper;
 
-        public UsersController(IUserService userService, IMapper mapper)
+        public UsersController(IUserService userService, IBookService bookService, IMapper mapper)
         {
             this.userService = userService;
+            this.bookService = bookService;
             this.mapper = mapper;
         }
+
+        /* 
+         * =============================
+         *             User
+         * =============================
+         */
 
         // GET api/v1/users
         [HttpGet]
@@ -49,11 +57,11 @@ namespace LibraryAPI.API.Controllers
 
         // GET api/v1/users/{userID}
         [HttpGet("{userID}", Name = "GetUserByID")]
-        public IActionResult GetUser(int userID)
+        public IActionResult GetUser(int userID, [FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
         {
             try
             {
-                var user = userService.GetUserByID(userID);
+                var user = userService.GetUserByID(userID, pageNumber, pageSize);
 
                 return Ok(user);
             }
@@ -100,7 +108,7 @@ namespace LibraryAPI.API.Controllers
             {
                 var error = new ErrorDTO
                 {
-                    Code = 400,
+                    Code = 412,
                     Message = "Validation error. Invalid input"
                 };
 
@@ -110,7 +118,7 @@ namespace LibraryAPI.API.Controllers
             try
             {
                 var userID = userService.AddUser(user);
-                var createdUser = userService.GetUserByID(userID);
+                var createdUser = userService.GetUserByID(userID, 1, null);
 
                 return CreatedAtRoute("GetUserByID", new { userID = userID }, createdUser);
             }
@@ -144,7 +152,7 @@ namespace LibraryAPI.API.Controllers
             {
                 var error = new ErrorDTO
                 {
-                    Code = 400,
+                    Code = 412,
                     Message = "Validation error. Invalid input"
                 };
 
@@ -197,7 +205,7 @@ namespace LibraryAPI.API.Controllers
             {
                 var error = new ErrorDTO
                 {
-                    Code = 400,
+                    Code = 412,
                     Message = "Validation error. Invalid input"
                 };
 
@@ -257,6 +265,224 @@ namespace LibraryAPI.API.Controllers
                 var error = new ErrorDTO
                 {
                     Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        /* 
+         * =============================
+         *             Loans
+         * =============================
+         */
+
+        // GET api/v1/users/{userID}/books
+        [HttpGet("{userID}/books", Name = "GetUserBooks")]
+        public IActionResult GetUserBooks(int userID, [FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
+        {
+            try
+            {
+                var books = bookService.GetBooksInLoanByUserID(userID, pageNumber, pageSize);
+
+                return Ok(books);
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // POST api/v1/users/{userID}/books/{bookID}
+        [HttpPost("{userID}/books/{bookID}")]
+        public IActionResult LoanBook(int userID, int bookID)
+        {
+            try
+            {
+                var books = bookService.AddLoan(userID, bookID);
+
+                return CreatedAtRoute("GetUserBooks", new { userID = userID }, null);
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (AlreadyExistsException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 409,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // DELETE api/v1/users/{userID}/books/{bookID}
+        [HttpDelete("{userID}/books/{bookID}")]
+        public IActionResult ReturnBook(int userID, int bookID)
+        {
+            try
+            {
+                bookService.ReturnBook(userID, bookID);
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // PUT api/v1/users/{userID}/books/{bookID}
+        [HttpPut("{userID}/books/{bookID}")]
+        public IActionResult ReplaceLoan(int userID, int bookID, [FromBody] LoanViewModel loan)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 412,
+                    Message = "Validation error. Invalid input"
+                };
+
+                return StatusCode(error.Code, error);
+            }
+
+            try
+            {
+                bookService.ReplaceLoan(userID, bookID, loan);
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (InvalidDataException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 409,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // PATCH api/v1/users/{userID}/books/{bookID}
+        [HttpPatch("{userID}/books/{bookID}")]
+        public IActionResult UpdateLoan(int userID, int bookID, [FromBody] PatchLoanViewModel loan)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 412,
+                    Message = "Validation error. Invalid input"
+                };
+
+                return StatusCode(error.Code, error);
+            }
+
+            try
+            {
+                bookService.UpdateLoan(userID, bookID, loan);
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (InvalidDataException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 409,
                     Message = ex.Message
                 };
 
