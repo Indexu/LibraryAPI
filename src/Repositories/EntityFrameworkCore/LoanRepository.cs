@@ -213,6 +213,119 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             db.SaveChanges();
         }
 
+        public Envelope<UserReportDTO> GetUsersReport(int pageNumber, int? pageMaxSize, DateTime? loanDate, int? duration)
+        {
+            var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
+
+            var query = db.Loans.AsQueryable();
+
+            // Filter by date
+            if (loanDate.HasValue)
+            {
+                query = query.Where(l => l.LoanDate <= loanDate.Value && (!l.ReturnDate.HasValue || (loanDate <= l.ReturnDate)));
+            }
+
+            // Filter by duration
+            if (duration.HasValue)
+            {
+                DateTime dateToUse = loanDate.HasValue ? loanDate.Value : DateTime.Now;
+                query = query.Where(l =>
+                    (duration.Value <= (dateToUse - l.LoanDate).TotalDays)
+                    && (!l.ReturnDate.HasValue
+                        || (l.ReturnDate.HasValue && dateToUse <= l.ReturnDate.Value)));
+            }
+
+            // Group and order by user ID
+            var group = query.Include(l => l.User).Include(l => l.Book).GroupBy(l => l.UserID, l => l).ToList();
+            group.OrderBy(g => g.Key);
+
+            var totalNumberOfItems = group.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var report = group.Select(g => g.ToList()).Skip((pageNumber - 1) * maxSize).Take(maxSize);
+
+            // Map entities over to DTOs
+            var userReportDTOs = new List<UserReportDTO>();
+            foreach (var entry in report)
+            {
+                var userReportDTO = new UserReportDTO
+                {
+                    User = mapper.Map<UserEntity, UserDTO>(entry[0].User),
+                    UserLoans = mapper.Map<IList<LoanEntity>, IList<UserLoanDTO>>(entry)
+                };
+
+                userReportDTOs.Add(userReportDTO);
+            }
+
+            return new Envelope<UserReportDTO>
+            {
+                Items = userReportDTOs,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = userReportDTOs.Count,
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
+        public Envelope<BookReportDTO> GetBooksReport(int pageNumber, int? pageMaxSize, DateTime? loanDate, int? duration)
+        {
+            var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
+
+            var query = db.Loans.AsQueryable();
+
+            // Filter by date
+            if (loanDate.HasValue)
+            {
+                query = query.Where(l => l.LoanDate <= loanDate.Value && (!l.ReturnDate.HasValue || (loanDate <= l.ReturnDate)));
+            }
+
+            // Filter by duration
+            if (duration.HasValue)
+            {
+                DateTime dateToUse = loanDate.HasValue ? loanDate.Value : DateTime.Now;
+                query = query.Where(l => (duration.Value <= (dateToUse - l.LoanDate).TotalDays));
+            }
+
+            // Group and order by book ID
+            var group = query.GroupBy(l => l.BookID, l => l);
+            group.OrderBy(g => g.Key);
+
+            var totalNumberOfItems = group.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var report = group.Skip((pageNumber - 1) * maxSize).Take(maxSize).Select(g => g.ToList());
+
+            // Map entities over to DTOs
+            var bookReportDTOs = new List<BookReportDTO>();
+            foreach (var entry in report)
+            {
+                var bookReportDTO = new BookReportDTO
+                {
+                    Book = mapper.Map<BookEntity, BookDTO>(entry[0].Book),
+                    BookLoans = mapper.Map<IList<LoanEntity>, IList<BookLoanDTO>>(entry)
+                };
+
+                bookReportDTOs.Add(bookReportDTO);
+            }
+
+            return new Envelope<BookReportDTO>
+            {
+                Items = bookReportDTOs,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = bookReportDTOs.Count,
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
         public int AddLoan(LoanViewModel loan)
         {
             var loanEntity = mapper.Map<LoanViewModel, LoanEntity>(loan);

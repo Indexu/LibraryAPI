@@ -18,12 +18,17 @@ namespace LibraryAPI.API.Controllers
     {
         private readonly IUserService userService;
         private readonly IBookService bookService;
+        private readonly IReportingService reportingService;
         private readonly IMapper mapper;
 
-        public UsersController(IUserService userService, IBookService bookService, IMapper mapper)
+        public UsersController(IUserService userService,
+                               IBookService bookService,
+                               IReportingService reportingService,
+                               IMapper mapper)
         {
             this.userService = userService;
             this.bookService = bookService;
+            this.reportingService = reportingService;
             this.mapper = mapper;
         }
 
@@ -35,13 +40,23 @@ namespace LibraryAPI.API.Controllers
 
         // GET api/v1/users
         [HttpGet]
-        public IActionResult GetUsers([FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
+        public IActionResult GetUsers([FromQuery] int pageNumber = 1,
+                                      [FromQuery] int? pageSize = null,
+                                      [FromQuery] DateTime? loanDate = null,
+                                      [FromQuery] int? duration = null)
         {
             try
             {
-                var users = userService.GetUsers(pageNumber, pageSize);
-
-                return Ok(users);
+                if (!loanDate.HasValue && !duration.HasValue)
+                {
+                    var users = userService.GetUsers(pageNumber, pageSize);
+                    return Ok(users);
+                }
+                else
+                {
+                    var report = reportingService.GetUsersReport(pageNumber, pageSize, loanDate, duration);
+                    return Ok(report);
+                }
             }
             catch (Exception ex)
             {

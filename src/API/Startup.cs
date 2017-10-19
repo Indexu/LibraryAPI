@@ -52,6 +52,8 @@ namespace LibraryAPI.API
             services.AddTransient<ILoanRepository, LoanRepository>();
             services.AddTransient<ILoanService, LoanService>();
 
+            services.AddTransient<IReportingService, ReportingService>();
+
             // Database info
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlite("Data Source=../Repositories/LibraryAPI.db", db => db.MigrationsAssembly("API")));

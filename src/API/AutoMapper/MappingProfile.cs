@@ -25,6 +25,7 @@ namespace LibraryAPI.API.AutoMapper
             CreateMap<LoanEntity, LoanDTO>();
             CreateMap<LoanDTO, UserLoanDTO>();
             CreateMap<LoanEntity, UserLoanDTO>();
+            CreateMap<LoanEntity, BookLoanDTO>();
             CreateMap<PatchLoanViewModel, LoanViewModel>();
             CreateMap<LoanViewModel, PatchLoanViewModel>();
         }
