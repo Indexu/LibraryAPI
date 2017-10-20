@@ -130,6 +130,39 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             };
         }
 
+        public Envelope<BookLoanDTO> GetLoansByBookID(int bookID, bool active, int pageNumber, int? pageMaxSize)
+        {
+            var query = db.Loans
+                        .Include(l => l.User)
+                        .Where(l => l.BookID == bookID && (active ? l.ReturnDate == null : true))
+                        .OrderByDescending(l => l.LoanDate);
+
+            var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
+            var totalNumberOfItems = query.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var loanEntities = query
+                                .Select(l => l)
+                                .Skip((pageNumber - 1) * maxSize)
+                                .Take(maxSize)
+                                .ToList();
+
+            var bookLoansDTO = Mapper.Map<IList<LoanEntity>, IList<BookLoanDTO>>(loanEntities);
+
+            return new Envelope<BookLoanDTO>
+            {
+                Items = bookLoansDTO,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = bookLoansDTO.Count,
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
         public LoanDTO GetLoanByID(int loanID)
         {
             var loanEntity = db.Loans
@@ -287,17 +320,20 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             if (duration.HasValue)
             {
                 DateTime dateToUse = loanDate.HasValue ? loanDate.Value : DateTime.Now;
-                query = query.Where(l => (duration.Value <= (dateToUse - l.LoanDate).TotalDays));
+                query = query.Where(l =>
+                    (duration.Value <= (dateToUse - l.LoanDate).TotalDays)
+                    && (!l.ReturnDate.HasValue
+                        || (l.ReturnDate.HasValue && dateToUse <= l.ReturnDate.Value)));
             }
 
             // Group and order by book ID
-            var group = query.GroupBy(l => l.BookID, l => l);
+            var group = query.Include(l => l.User).Include(l => l.Book).GroupBy(l => l.BookID, l => l).ToList();
             group.OrderBy(g => g.Key);
 
             var totalNumberOfItems = group.Count();
             var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
 
-            var report = group.Skip((pageNumber - 1) * maxSize).Take(maxSize).Select(g => g.ToList());
+            var report = group.Select(g => g.ToList()).Skip((pageNumber - 1) * maxSize).Take(maxSize);
 
             // Map entities over to DTOs
             var bookReportDTOs = new List<BookReportDTO>();

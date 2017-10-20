@@ -13,11 +13,14 @@ namespace LibraryAPI.API.AutoMapper
             CreateMap<UserViewModel, UserEntity>();
             CreateMap<UserEntity, UserDTO>();
             CreateMap<UserEntity, UserDetailsDTO>();
+            CreateMap<UserDTO, UserDetailsDTO>();
             CreateMap<PatchUserViewModel, UserViewModel>();
 
             // Books
             CreateMap<BookViewModel, BookEntity>();
             CreateMap<BookEntity, BookDTO>();
+            CreateMap<BookEntity, BookDetailsDTO>();
+            CreateMap<BookDTO, BookDetailsDTO>();
             CreateMap<PatchBookViewModel, BookViewModel>();
 
             // Loans

@@ -33,8 +33,8 @@ namespace LibraryAPI.Interfaces.Repositories
         /// </summary>
         /// <param name="book">The BookViewModel containing the book information</param>
         /// <para />
-        /// <returns>An integer representing the ID of the added book</returns>
-        int AddBook(BookViewModel book);
+        /// <returns>A BookDTO for the created book</returns>
+        BookDTO AddBook(BookViewModel book);
 
         /// <summary>
         /// Update some (or all) of a book's information

@@ -57,7 +57,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             };
         }
 
-        public UserDetailsDTO GetUserByID(int userID, bool loanHistory, int pageNumber, int? pageMaxSize)
+        public UserDTO GetUserByID(int userID)
         {
             var userEntity = db.Users.Where(u => u.ID == userID).SingleOrDefault();
 
@@ -66,14 +66,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
                 throw new NotFoundException(notFoundMessage);
             }
 
-            var userDetailsDTO = mapper.Map<UserEntity, UserDetailsDTO>(userEntity);
-
-            if (loanHistory)
-            {
-                var history = loanRepository.GetLoansByUserID(userID, false, pageNumber, pageMaxSize);
-
-                userDetailsDTO.LoanHistory = history;
-            }
+            var userDetailsDTO = mapper.Map<UserEntity, UserDTO>(userEntity);
 
             return userDetailsDTO;
         }

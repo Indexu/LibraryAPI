@@ -46,6 +46,20 @@ namespace LibraryAPI.Interfaces.Repositories
         Envelope<UserLoanDTO> GetLoansByUserID(int userID, bool active, int pageNumber, int? pageMaxSize);
 
         /// <summary>
+        /// Get all loans for a book
+        /// </summary>
+        /// <param name="userID">The ID of the user</param>
+        /// <para />
+        /// <param name="active">Whether or not the loans must be currently active</param>
+        /// <para />
+        /// <param name="pageNumber">The page number of the paging</param>
+        /// <para />
+        /// <param name="pageMaxSize">The maximum items on a single page</param>
+        /// <para />
+        /// <returns>An Envelope of BookLoanDTO</returns>
+        Envelope<BookLoanDTO> GetLoansByBookID(int bookID, bool active, int pageNumber, int? pageMaxSize);
+
+        /// <summary>
         /// Get a loan by loan ID
         /// </summary>
         /// <param name="loanID">The ID of the loan</param>

@@ -17,23 +17,35 @@ namespace LibraryAPI.API.Controllers
     public class BooksController : Controller
     {
         private readonly IBookService bookService;
+        private readonly IReportingService reportingService;
         private readonly IMapper mapper;
 
-        public BooksController(IBookService bookService, IMapper mapper)
+        public BooksController(IBookService bookService, IReportingService reportingService, IMapper mapper)
         {
             this.bookService = bookService;
+            this.reportingService = reportingService;
             this.mapper = mapper;
         }
 
         // GET api/v1/books
         [HttpGet]
-        public IActionResult GetBooks([FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
+        public IActionResult GetBooks([FromQuery] int pageNumber = 1,
+                                      [FromQuery] int? pageSize = null,
+                                      [FromQuery] DateTime? loanDate = null,
+                                      [FromQuery] int? duration = null)
         {
             try
             {
-                var books = bookService.GetBooks(pageNumber, pageSize);
-
-                return Ok(books);
+                if (!loanDate.HasValue && !duration.HasValue)
+                {
+                    var books = bookService.GetBooks(pageNumber, pageSize);
+                    return Ok(books);
+                }
+                else
+                {
+                    var report = reportingService.GetBooksReport(pageNumber, pageSize, loanDate, duration);
+                    return Ok(report);
+                }
             }
             catch (Exception ex)
             {
@@ -49,11 +61,11 @@ namespace LibraryAPI.API.Controllers
 
         // GET api/v1/book/{bookID}
         [HttpGet("{bookID}", Name = "GetBookByID")]
-        public IActionResult GetBook(int bookID)
+        public IActionResult GetBook(int bookID, [FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
         {
             try
             {
-                var book = bookService.GetBookByID(bookID);
+                var book = bookService.GetBookByID(bookID, pageNumber, pageSize);
 
                 return Ok(book);
             }
@@ -96,10 +108,9 @@ namespace LibraryAPI.API.Controllers
 
             try
             {
-                var bookID = bookService.AddBook(book);
-                var createdBook = bookService.GetBookByID(bookID);
+                var bookDTO = bookService.AddBook(book);
 
-                return CreatedAtRoute("GetBookByID", new { bookID = bookID }, createdBook);
+                return CreatedAtRoute("GetBookByID", new { bookID = bookDTO.ID }, bookDTO);
             }
             catch (AlreadyExistsException ex)
             {

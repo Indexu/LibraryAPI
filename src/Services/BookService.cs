@@ -47,11 +47,17 @@ namespace LibraryAPI.Services
             }
         }
 
-        public BookDTO GetBookByID(int bookID)
+        public BookDetailsDTO GetBookByID(int bookID, int pageNumber, int? pageMaxSize)
         {
             try
             {
-                return bookRepository.GetBookByID(bookID);
+                var book = bookRepository.GetBookByID(bookID);
+
+                var details = mapper.Map<BookDTO, BookDetailsDTO>(book);
+
+                details.LoanHistory = loanRepository.GetLoansByBookID(bookID, false, pageNumber, pageMaxSize);
+
+                return details;
             }
             catch (Exception ex)
             {
@@ -59,7 +65,7 @@ namespace LibraryAPI.Services
             }
         }
 
-        public int AddBook(BookViewModel book)
+        public BookDTO AddBook(BookViewModel book)
         {
             try
             {

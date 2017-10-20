@@ -37,16 +37,20 @@ namespace LibraryAPI.Interfaces.Services
         /// </summary>
         /// <param name="bookID">The ID of the book</param>
         /// <para />
-        /// <returns>A BookDTO</returns>
-        BookDTO GetBookByID(int bookID);
+        /// <param name="pageNumber">The page number of the paging for loan history</param>
+        /// <para />
+        /// <param name="pageMaxSize">The maximum items on a single page of loan history</param>
+        /// <para />
+        /// <returns>A BookDetailsDTO</returns>
+        BookDetailsDTO GetBookByID(int bookID, int pageNumber, int? pageMaxSize);
 
         /// <summary>
         /// Add a book
         /// </summary>
         /// <param name="book">The BookViewModel containing the book information</param>
         /// <para />
-        /// <returns>An integer representing the ID of the added book</returns>
-        int AddBook(BookViewModel book);
+        /// <returns>A BookDTO of the created book</returns>
+        BookDTO AddBook(BookViewModel book);
 
         /// <summary>
         /// Add a loan

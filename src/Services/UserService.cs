@@ -13,11 +13,13 @@ namespace LibraryAPI.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
+        private readonly ILoanRepository loanRepository;
         private readonly IMapper mapper;
 
-        public UserService(IUserRepository userRepository, IMapper mapper)
+        public UserService(IUserRepository userRepository, ILoanRepository loanRepository, IMapper mapper)
         {
             this.userRepository = userRepository;
+            this.loanRepository = loanRepository;
             this.mapper = mapper;
         }
 
@@ -37,7 +39,13 @@ namespace LibraryAPI.Services
         {
             try
             {
-                return userRepository.GetUserByID(userID, true, pageNumber, pageMaxSize);
+                var user = userRepository.GetUserByID(userID);
+
+                var details = mapper.Map<UserDTO, UserDetailsDTO>(user);
+
+                details.LoanHistory = loanRepository.GetLoansByUserID(userID, false, pageNumber, pageMaxSize);
+
+                return details;
             }
             catch (Exception ex)
             {
@@ -73,7 +81,7 @@ namespace LibraryAPI.Services
         {
             try
             {
-                var oldUser = userRepository.GetUserByID(userID, false, 0, 0);
+                var oldUser = userRepository.GetUserByID(userID);
 
                 MergeUsersForPatch(user, oldUser);
 
@@ -99,7 +107,7 @@ namespace LibraryAPI.Services
             }
         }
 
-        private void MergeUsersForPatch(PatchUserViewModel user, UserDetailsDTO oldUser)
+        private void MergeUsersForPatch(PatchUserViewModel user, UserDTO oldUser)
         {
             if (string.IsNullOrEmpty(user.Name))
             {

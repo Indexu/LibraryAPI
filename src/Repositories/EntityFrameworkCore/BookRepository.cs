@@ -60,7 +60,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             return bookDTO;
         }
 
-        public int AddBook(BookViewModel book)
+        public BookDTO AddBook(BookViewModel book)
         {
             // Check if exists by ISBN
             if (db.Books.Where(b => b.ISBN == book.ISBN).Any())
@@ -74,7 +74,9 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             db.Books.Add(bookEntity);
             db.SaveChanges();
 
-            return bookEntity.ID;
+            var bookDTO = mapper.Map<BookEntity, BookDTO>(bookEntity);
+
+            return bookDTO;
         }
 
         public void UpdateBook(int bookID, BookViewModel book)
