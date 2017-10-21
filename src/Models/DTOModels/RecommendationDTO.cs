@@ -23,6 +23,6 @@ namespace LibraryAPI.Models.DTOModels
         /// <para />
         /// Example: 4.3
         /// </value>
-        public double AverageRating { get; set; }
+        public double? AverageRating { get; set; }
     }
 }

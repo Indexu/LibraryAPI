@@ -9,6 +9,7 @@ using LibraryAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using System;
+using System.Data.Common;
 
 namespace LibraryAPI.Repositories.EntityFrameworkCore
 {
@@ -268,45 +269,128 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
                 throw new NotFoundException("User not found");
             }
 
-            var query =
-            (
-                from b in db.Books
-                join r in db.Reviews on b.ID equals r.BookID into rs
-                from r in rs.DefaultIfEmpty()
-                    //where !db.Loans.Any(l => l.UserID == userID)
-                group r by b.ID into g
-                from p in g
-                let AverageRating = g.Average(ga => ga.Rating)
-                orderby AverageRating descending
-                select new { Book = p.Book, AverageRating = AverageRating }
-            );
-
             var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
+            var totalNumberOfItems = 0;
+            var pageCount = 0;
 
-            var totalNumberOfItems = query.Count();
-            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+            // Doing left outer join with grouping and aggregation in LINQ is a pain.
+            // I tried for hours and decided to do it the poor mans way, raw SQL style.
 
-            var recommendations = query.Skip((pageNumber - 1) * maxSize).Take(maxSize).ToList();
+            var resultList = new List<RecommendationDTO>();
 
-            var recommendationDTOs = new List<RecommendationDTO>();
-            foreach (var item in recommendations)
+            // Get the DB connection
+            var conn = db.Database.GetDbConnection();
+            try
             {
-                var recommendationDTO = new RecommendationDTO
+                // Open connection and let the fun begin
+                conn.Open();
+                using (var command = conn.CreateCommand())
                 {
-                    Book = mapper.Map<BookEntity, BookDTO>(item.Book),
-                    AverageRating = item.AverageRating
-                };
+                    // The SQL query to get the total number of books being recommended
+                    var countQuery = String.Format("SELECT COUNT(*) "
+                                            + "FROM "
+                                            + "( "
+                                                + "SELECT 1 "
+                                                + "FROM Books b "
+                                                + "LEFT JOIN Reviews r ON b.ID = r.BookID "
+                                                + "WHERE NOT EXISTS "
+                                                + "( "
+                                                    + "SELECT 1 "
+                                                    + "FROM Loans l "
+                                                    + "WHERE l.BookID = b.ID AND l.UserID = {0} "
+                                                + ") "
+                                                + "AND NOT EXISTS "
+                                                + "( "
+                                                    + "SELECT 1 "
+                                                    + "FROM Reviews r2 "
+                                                    + "WHERE r2.BookID = b.ID AND r2.UserID = {0} "
+                                                + ") "
+                                                + "GROUP BY b.ID "
+                                            + ") ",
+                                            userID);
 
-                recommendationDTOs.Add(recommendationDTO);
+                    // Set and execute the query
+                    command.CommandText = countQuery;
+                    var reader = command.ExecuteReader();
+
+                    // Get the count
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        totalNumberOfItems = reader.GetInt32(0);
+                    }
+
+                    reader.Dispose();
+
+                    // Calculate pagination
+                    pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+                    var skip = (pageNumber - 1) * maxSize;
+
+                    // The SQL query for the recommendations
+                    var recommendationsQuery = String.Format("SELECT b.ID, b.Title, b.Author, b.PublishDate, b.ISBN, avg(r.Rating) "
+                                            + "FROM Books b "
+                                            + "LEFT JOIN Reviews r ON b.ID = r.BookID "
+                                            + "WHERE NOT EXISTS "
+                                            + "( "
+                                                + "SELECT 1 "
+                                                + "FROM Loans l "
+                                                + "WHERE l.BookID = b.ID AND l.UserID = {0} "
+                                            + ") "
+                                            + "AND NOT EXISTS "
+                                            + "( "
+                                                + "SELECT 1 "
+                                                + "FROM Reviews r2 "
+                                                + "WHERE r2.BookID = b.ID AND r2.UserID = {0} "
+                                            + ") "
+                                            + "GROUP BY b.ID "
+                                            + "ORDER BY avg(r.Rating) DESC, b.Title ASC "
+                                            + "LIMIT {1}, {2}",
+                                            userID, skip, maxSize);
+
+                    // Set and execute the query
+                    command.CommandText = recommendationsQuery;
+                    reader = command.ExecuteReader();
+
+                    // Read over and add the rows
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var row = new RecommendationDTO
+                            {
+                                Book = new BookDTO
+                                {
+                                    ID = reader.GetInt32(0),
+                                    Title = reader.GetString(1),
+                                    Author = reader.GetString(2),
+                                    PublishDate = reader.GetDateTime(3),
+                                    ISBN = reader.GetString(4),
+                                }
+                            };
+
+                            if (!reader.IsDBNull(5))
+                            {
+                                row.AverageRating = reader.GetDouble(5);
+                            }
+
+                            resultList.Add(row);
+                        }
+                    }
+                    reader.Dispose();
+                }
+            }
+            finally
+            {
+                conn.Close();
             }
 
             return new Envelope<RecommendationDTO>
             {
-                Items = recommendationDTOs,
+                Items = resultList,
                 Paging = new Paging
                 {
                     PageCount = pageCount,
-                    PageSize = recommendationDTOs.Count,
+                    PageSize = resultList.Count,
                     PageMaxSize = maxSize,
                     PageNumber = pageNumber,
                     TotalNumberOfItems = totalNumberOfItems,
