@@ -52,7 +52,11 @@ namespace LibraryAPI.API
             services.AddTransient<ILoanRepository, LoanRepository>();
             services.AddTransient<ILoanService, LoanService>();
 
+            services.AddTransient<IReviewRepository, ReviewRepository>();
+            services.AddTransient<IReviewService, ReviewService>();
+
             services.AddTransient<IReportingService, ReportingService>();
+            services.AddTransient<IRecommendationService, RecommendationService>();
 
             // Database info
             services.AddDbContext<DatabaseContext>(options =>

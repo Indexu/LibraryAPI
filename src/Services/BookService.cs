@@ -10,17 +10,16 @@ using AutoMapper;
 
 namespace LibraryAPI.Services
 {
-    public class BookService : IBookService
+    public class BookService : AbstractService, IBookService
     {
         private readonly IBookRepository bookRepository;
         private readonly ILoanRepository loanRepository;
-        private readonly IMapper mapper;
 
         public BookService(IBookRepository bookRepository, ILoanRepository loanRepository, IMapper mapper)
+            : base(mapper)
         {
             this.bookRepository = bookRepository;
             this.loanRepository = loanRepository;
-            this.mapper = mapper;
         }
 
         public Envelope<BookDTO> GetBooks(int pageNumber, int? pageMaxSize)

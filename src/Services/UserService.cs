@@ -10,17 +10,16 @@ using AutoMapper;
 
 namespace LibraryAPI.Services
 {
-    public class UserService : IUserService
+    public class UserService : AbstractService, IUserService
     {
         private readonly IUserRepository userRepository;
         private readonly ILoanRepository loanRepository;
-        private readonly IMapper mapper;
 
         public UserService(IUserRepository userRepository, ILoanRepository loanRepository, IMapper mapper)
+            : base(mapper)
         {
             this.userRepository = userRepository;
             this.loanRepository = loanRepository;
-            this.mapper = mapper;
         }
 
         public Envelope<UserDTO> GetUsers(int pageNumber, int? pageMaxSize)

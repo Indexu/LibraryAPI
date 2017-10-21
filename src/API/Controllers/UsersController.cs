@@ -19,16 +19,22 @@ namespace LibraryAPI.API.Controllers
         private readonly IUserService userService;
         private readonly IBookService bookService;
         private readonly IReportingService reportingService;
+        private readonly IReviewService reviewService;
+        private readonly IRecommendationService recommendationService;
         private readonly IMapper mapper;
 
         public UsersController(IUserService userService,
                                IBookService bookService,
                                IReportingService reportingService,
+                               IReviewService reviewService,
+                               IRecommendationService recommendationService,
                                IMapper mapper)
         {
             this.userService = userService;
             this.bookService = bookService;
             this.reportingService = reportingService;
+            this.reviewService = reviewService;
+            this.recommendationService = recommendationService;
             this.mapper = mapper;
         }
 
@@ -47,11 +53,13 @@ namespace LibraryAPI.API.Controllers
         {
             try
             {
+                // Get all users
                 if (!loanDate.HasValue && !duration.HasValue)
                 {
                     var users = userService.GetUsers(pageNumber, pageSize);
                     return Ok(users);
                 }
+                // Get report for users
                 else
                 {
                     var report = reportingService.GetUsersReport(pageNumber, pageSize, loanDate, duration);
@@ -100,19 +108,6 @@ namespace LibraryAPI.API.Controllers
 
                 return StatusCode(error.Code, error);
             }
-        }
-
-        // GET api/v1/users/{userID}/recommendations
-        [HttpGet("{userID}/recommendations")]
-        public IActionResult GetRecommendations(int userID)
-        {
-            var error = new ErrorDTO
-            {
-                Code = 501,
-                Message = "Recommendations not yet implemented"
-            };
-
-            return StatusCode(error.Code, error);
         }
 
         // POST api/v1/users
@@ -498,6 +493,285 @@ namespace LibraryAPI.API.Controllers
                 var error = new ErrorDTO
                 {
                     Code = 409,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        /* 
+         * =============================
+         *           Reviews
+         * =============================
+         */
+
+        // GET api/v1/users/{userID}/reviews
+        [HttpGet("{userID}/reviews")]
+        public IActionResult GetUserReviewsByID(int userID, [FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
+        {
+            try
+            {
+                var reviews = reviewService.GetReviewsByUserID(userID, pageNumber, pageSize);
+
+                return Ok(reviews);
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // GET api/v1/users/{userID}/reviews/{bookID}
+        [HttpGet("{userID}/reviews/{bookID}", Name = "GetUserReview")]
+        public IActionResult GetUserReview(int userID, int bookID)
+        {
+            try
+            {
+                var review = reviewService.GetReview(userID, bookID);
+
+                return Ok(review);
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // POST api/v1/users/{userID}/reviews/{bookID}
+        [HttpPost("{userID}/reviews/{bookID}")]
+        public IActionResult AddReview(int userID, int bookID, [FromBody] ReviewViewModel review)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 412,
+                    Message = "Validation error. Invalid input"
+                };
+
+                return StatusCode(error.Code, error);
+            }
+
+            try
+            {
+                var addedReview = reviewService.AddReview(userID, bookID, review);
+
+                return CreatedAtRoute("GetUserReview", new { userID = userID, bookID = bookID }, addedReview);
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (AlreadyExistsException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 409,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // PUT api/v1/users/{userID}/reviews/{bookID}
+        [HttpPut("{userID}/reviews/{bookID}")]
+        public IActionResult ReplaceReview(int userID, int bookID, [FromBody] ReviewViewModel review)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 412,
+                    Message = "Validation error. Invalid input"
+                };
+
+                return StatusCode(error.Code, error);
+            }
+
+            try
+            {
+                reviewService.ReplaceReview(userID, bookID, review);
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // PATCH api/v1/users/{userID}/reviews/{bookID}
+        [HttpPatch("{userID}/reviews/{bookID}")]
+        public IActionResult UpdateReview(int userID, int bookID, [FromBody] PatchReviewViewModel review)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 412,
+                    Message = "Validation error. Invalid input"
+                };
+
+                return StatusCode(error.Code, error);
+            }
+
+            try
+            {
+                reviewService.UpdateReview(userID, bookID, review);
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        // DELETE api/v1/users/{userID}/reviews/{bookID}
+        [HttpDelete("{userID}/reviews/{bookID}")]
+        public IActionResult DeleteReview(int userID, int bookID)
+        {
+            try
+            {
+                reviewService.DeleteReview(userID, bookID);
+
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 500,
+                    Message = ex.Message
+                };
+
+                return StatusCode(error.Code, error);
+            }
+        }
+
+        /* 
+         * =============================
+         *        Recommendations
+         * =============================
+         */
+
+        // GET api/v1/users/{userID}/recommendations
+        [HttpGet("{userID}/recommendations")]
+        public IActionResult GetRecommendations(int userID, [FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
+        {
+            try
+            {
+                var recommendations = recommendationService.GetRecommendationsByUserID(userID, pageNumber, pageSize);
+
+                return Ok(recommendations);
+            }
+            catch (NotFoundException ex)
+            {
+                var error = new ErrorDTO
+                {
+                    Code = 404,
                     Message = ex.Message
                 };
 

@@ -7,7 +7,7 @@ using System;
 namespace LibraryAPI.Interfaces.Services
 {
     /// <summary>
-    /// An interface detailing the operations of the recommendation service
+    /// An interface detailing the operations of the reporting service
     /// </summary>
     public interface IReportingService
     {

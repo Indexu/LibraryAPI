@@ -10,15 +10,14 @@ using AutoMapper;
 
 namespace LibraryAPI.Services
 {
-    public class ReportingService : IReportingService
+    public class ReportingService : AbstractService, IReportingService
     {
         private readonly ILoanRepository loanRepository;
-        private readonly IMapper mapper;
 
         public ReportingService(ILoanRepository loanRepository, IMapper mapper)
+            : base(mapper)
         {
             this.loanRepository = loanRepository;
-            this.mapper = mapper;
         }
 
         public Envelope<UserReportDTO> GetUsersReport(int pageNumber, int? pageMaxSize, DateTime? loanDate, int? duration)

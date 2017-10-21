@@ -31,6 +31,15 @@ namespace LibraryAPI.API.AutoMapper
             CreateMap<LoanEntity, BookLoanDTO>();
             CreateMap<PatchLoanViewModel, LoanViewModel>();
             CreateMap<LoanViewModel, PatchLoanViewModel>();
+
+            // Reviews
+            CreateMap<ReviewViewModel, ReviewEntity>();
+            CreateMap<ReviewEntity, ReviewDTO>();
+            CreateMap<ReviewEntity, UserReviewDTO>();
+            CreateMap<ReviewEntity, BookReviewDTO>();
+            CreateMap<ReviewDTO, UserReviewDTO>();
+            CreateMap<ReviewDTO, BookReviewDTO>();
+            CreateMap<ReviewViewModel, PatchReviewViewModel>();
         }
     }
 }
