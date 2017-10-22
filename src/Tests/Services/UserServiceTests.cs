@@ -6,6 +6,7 @@ using LibraryAPI.Interfaces.Repositories;
 using LibraryAPI.Models.DTOModels;
 using LibraryAPI.Models;
 using LibraryAPI.Models.ViewModels;
+using LibraryAPI.Tests.MockUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,6 @@ namespace LibraryAPI.Tests.Services
     [TestClass]
     public class UserServiceTests
     {
-        private List<UserDTO> allUsers;
-        private Envelope<UserDTO> usersEnvelope;
-        private UserDetailsDTO userDetails;
-
         /* 
          * ===================
          *      GetUsers
@@ -33,29 +30,29 @@ namespace LibraryAPI.Tests.Services
             var pageNumber = 1;
             int? pageSize = null;
 
-            CreateUsers(10);
-            CreateUsersEnvelope(pageNumber, pageSize);
+            var users = MockDataGenerator.CreateUsers(10);
+            var envelope = MockDataGenerator.CreateUsersEnvelope(users, pageNumber, pageSize);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
             var mockMapper = new Mock<IMapper>();
 
-            mockUserRepo.Setup(f => f.GetUsers(pageNumber, pageSize)).Returns(usersEnvelope);
+            mockUserRepo.Setup(f => f.GetUsers(pageNumber, pageSize)).Returns(envelope);
 
             var service = new UserService(mockUserRepo.Object, mockLoanRepo.Object, mockMapper.Object);
 
             // Act
-            var users = service.GetUsers(pageNumber, pageSize);
+            var returnedUsers = service.GetUsers(pageNumber, pageSize);
 
             // Assert
             mockUserRepo.Verify(f => f.GetUsers(pageNumber, pageSize), Times.Once());
-            Assert.IsNotNull(users);
-            Assert.AreEqual(users.Paging.PageNumber, pageNumber);
-            Assert.AreEqual(users.Paging.PageMaxSize, 50);
-            Assert.AreEqual(users.Paging.PageCount, 1);
-            Assert.AreEqual(users.Paging.TotalNumberOfItems, 10);
-            Assert.AreEqual(users.Items.First().ID, allUsers.First().ID);
-            Assert.AreEqual(users.Items.Last().ID, allUsers.Last().ID);
+            Assert.IsNotNull(returnedUsers);
+            Assert.AreEqual(returnedUsers.Paging.PageNumber, pageNumber);
+            Assert.AreEqual(returnedUsers.Paging.PageMaxSize, 50);
+            Assert.AreEqual(returnedUsers.Paging.PageCount, 1);
+            Assert.AreEqual(returnedUsers.Paging.TotalNumberOfItems, 10);
+            Assert.AreEqual(returnedUsers.Items.First().ID, users.First().ID);
+            Assert.AreEqual(returnedUsers.Items.Last().ID, users.Last().ID);
         }
 
         [TestMethod]
@@ -65,28 +62,28 @@ namespace LibraryAPI.Tests.Services
             var pageNumber = 1;
             int? pageSize = 5;
 
-            CreateUsers(10);
-            CreateUsersEnvelope(pageNumber, pageSize);
+            var users = MockDataGenerator.CreateUsers(10);
+            var envelope = MockDataGenerator.CreateUsersEnvelope(users, pageNumber, pageSize);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
             var mockMapper = new Mock<IMapper>();
 
-            mockUserRepo.Setup(f => f.GetUsers(pageNumber, pageSize)).Returns(usersEnvelope);
+            mockUserRepo.Setup(f => f.GetUsers(pageNumber, pageSize)).Returns(envelope);
 
             var service = new UserService(mockUserRepo.Object, mockLoanRepo.Object, mockMapper.Object);
 
             // Act
-            var users = service.GetUsers(pageNumber, pageSize);
+            var returnedUsers = service.GetUsers(pageNumber, pageSize);
 
             // Assert
             mockUserRepo.Verify(f => f.GetUsers(pageNumber, pageSize), Times.Once());
-            Assert.IsNotNull(users);
-            Assert.AreEqual(users.Paging.PageNumber, pageNumber);
-            Assert.AreEqual(users.Paging.PageMaxSize, pageSize);
-            Assert.AreEqual(users.Paging.PageCount, 2);
-            Assert.AreEqual(users.Paging.TotalNumberOfItems, 10);
-            Assert.AreEqual(users.Items.First().ID, allUsers.First().ID);
+            Assert.IsNotNull(returnedUsers);
+            Assert.AreEqual(returnedUsers.Paging.PageNumber, pageNumber);
+            Assert.AreEqual(returnedUsers.Paging.PageMaxSize, pageSize);
+            Assert.AreEqual(returnedUsers.Paging.PageCount, 2);
+            Assert.AreEqual(returnedUsers.Paging.TotalNumberOfItems, 10);
+            Assert.AreEqual(returnedUsers.Items.First().ID, users.First().ID);
         }
 
         [TestMethod]
@@ -124,12 +121,10 @@ namespace LibraryAPI.Tests.Services
             var pageNumber = 1;
             int? pageSize = null;
 
-            var user = CreateUser(userID);
-            var userDetails = CreateUserDetailsBasic(userID);
-            var loans = CreateUserLoans(numberOfLoans);
-            var loansEnvelope = CreateUsersLoansEnvelope(loans, pageNumber, pageSize);
-
-            CreateUserDetails(userID, numberOfLoans, pageNumber, pageSize);
+            var user = MockDataGenerator.CreateUser(userID);
+            var userDetails = MockDataGenerator.CreateUserDetailsBasic(userID);
+            var loans = MockDataGenerator.CreateUserLoans(numberOfLoans);
+            var loansEnvelope = MockDataGenerator.CreateUsersLoansEnvelope(loans, pageNumber, pageSize);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
@@ -165,12 +160,10 @@ namespace LibraryAPI.Tests.Services
             var pageNumber = 1;
             int? pageSize = 5;
 
-            var user = CreateUser(userID);
-            var userDetails = CreateUserDetailsBasic(userID);
-            var loans = CreateUserLoans(numberOfLoans);
-            var loansEnvelope = CreateUsersLoansEnvelope(loans, pageNumber, pageSize);
-
-            CreateUserDetails(userID, numberOfLoans, pageNumber, pageSize);
+            var user = MockDataGenerator.CreateUser(userID);
+            var userDetails = MockDataGenerator.CreateUserDetailsBasic(userID);
+            var loans = MockDataGenerator.CreateUserLoans(numberOfLoans);
+            var loansEnvelope = MockDataGenerator.CreateUsersLoansEnvelope(loans, pageNumber, pageSize);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
@@ -220,7 +213,7 @@ namespace LibraryAPI.Tests.Services
 
         /* 
          * ===================
-         *    GetUserByID
+         *      AddUser
          * ===================
          */
 
@@ -228,14 +221,10 @@ namespace LibraryAPI.Tests.Services
         public void AddUser()
         {
             // Arrange
-            var newUser = new UserViewModel
-            {
-                Name = "User 1",
-                Address = "1 Main Street",
-                Email = "user@user1.com"
-            };
+            var userID = 1;
+            var newUser = MockDataGenerator.CreateUserViewModel(userID);
 
-            var expectedUser = CreateUser(1);
+            var expectedUser = MockDataGenerator.CreateUser(1);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
@@ -251,7 +240,7 @@ namespace LibraryAPI.Tests.Services
             // Assert
             mockUserRepo.Verify(f => f.AddUser(newUser), Times.Once());
             Assert.IsNotNull(returnedUser);
-            Assert.AreEqual(returnedUser.ID, 1);
+            Assert.AreEqual(returnedUser.ID, userID);
             Assert.AreEqual(returnedUser.Name, newUser.Name);
             Assert.AreEqual(returnedUser.Email, newUser.Email);
             Assert.AreEqual(returnedUser.Address, newUser.Address);
@@ -286,12 +275,7 @@ namespace LibraryAPI.Tests.Services
             // Arrange
             var userID = 1;
 
-            var newUser = new UserViewModel
-            {
-                Name = "User 1",
-                Address = "1 Main Street",
-                Email = "user@user1.com"
-            };
+            var newUser = MockDataGenerator.CreateUserViewModel(userID);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
@@ -339,21 +323,11 @@ namespace LibraryAPI.Tests.Services
             // Arrange
             var userID = 1;
 
-            var newUser = new PatchUserViewModel
-            {
-                Name = "User 2",
-                Address = "2 Main Street",
-                Email = "user@user2.com"
-            };
+            var newUser = MockDataGenerator.CreatePatchUserViewModel(2);
 
-            var existingUser = new UserViewModel
-            {
-                Name = "User 1",
-                Address = "1 Main Street",
-                Email = "user@user1.com"
-            };
+            var existingUser = MockDataGenerator.CreateUserViewModel(userID);
 
-            var user = CreateUser(userID);
+            var user = MockDataGenerator.CreateUser(userID);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
@@ -382,14 +356,9 @@ namespace LibraryAPI.Tests.Services
 
             var newUser = new PatchUserViewModel();
 
-            var existingUser = new UserViewModel
-            {
-                Name = "User 1",
-                Address = "1 Main Street",
-                Email = "user@user1.com"
-            };
+            var existingUser = MockDataGenerator.CreateUserViewModel(userID);
 
-            var user = CreateUser(userID);
+            var user = MockDataGenerator.CreateUser(userID);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
@@ -417,21 +386,11 @@ namespace LibraryAPI.Tests.Services
             // Arrange
             var userID = 1;
 
-            var newUser = new PatchUserViewModel
-            {
-                Name = "User 2",
-                Address = "2 Main Street",
-                Email = "user@user2.com"
-            };
+            var newUser = new PatchUserViewModel();
 
-            var existingUser = new UserViewModel
-            {
-                Name = "User 1",
-                Address = "1 Main Street",
-                Email = "user@user1.com"
-            };
+            var existingUser = MockDataGenerator.CreateUserViewModel(userID);
 
-            var user = CreateUser(userID);
+            var user = MockDataGenerator.CreateUser(userID);
 
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLoanRepo = new Mock<ILoanRepository>();
@@ -491,135 +450,6 @@ namespace LibraryAPI.Tests.Services
 
             // Act
             service.DeleteUserByID(userID);
-        }
-
-        /* 
-        * ============================
-        *       Helper functions
-        * ============================
-        */
-
-        private void CreateUsers(int n)
-        {
-            allUsers = new List<UserDTO>();
-
-            for (int i = 0; i < n; i++)
-            {
-                var ID = i + 1;
-                var user = CreateUser(ID);
-
-                allUsers.Add(user);
-            }
-        }
-
-        private void CreateUsersEnvelope(int pageNumber, int? pageSize)
-        {
-            var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
-            var totalNumberOfItems = allUsers.Count;
-            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
-
-            var users = allUsers.Skip((pageNumber - 1) * maxSize).Take(maxSize);
-
-            usersEnvelope = new Envelope<UserDTO>
-            {
-                Items = users,
-                Paging = new Paging
-                {
-                    PageCount = pageCount,
-                    PageSize = users.Count(),
-                    PageMaxSize = maxSize,
-                    PageNumber = pageNumber,
-                    TotalNumberOfItems = totalNumberOfItems,
-                }
-            };
-        }
-
-        private UserDTO CreateUser(int userID)
-        {
-            return new UserDTO
-            {
-                ID = userID,
-                Name = String.Format("User {0}", userID),
-                Email = String.Format("user@user{0}.com", userID),
-                Address = String.Format("{0} Main Street", userID)
-            };
-        }
-
-        private UserDetailsDTO CreateUserDetailsBasic(int userID)
-        {
-            return new UserDetailsDTO
-            {
-                ID = userID,
-                Name = String.Format("User {0}", userID),
-                Email = String.Format("user@user{0}.com", userID),
-                Address = String.Format("{0} Main Street", userID)
-            };
-        }
-
-        private void CreateUserDetails(int userID, int numberOfLoans, int pageNumber, int? pageSize)
-        {
-            userDetails = new UserDetailsDTO
-            {
-                ID = userID,
-                Name = String.Format("User {0}", userID),
-                Email = String.Format("user@user{0}.com", userID),
-                Address = String.Format("{0} Main Street", userID),
-            };
-
-            var loans = CreateUserLoans(numberOfLoans);
-            var envelope = CreateUsersLoansEnvelope(loans, pageNumber, pageSize);
-
-            userDetails.LoanHistory = envelope;
-        }
-
-        private List<UserLoanDTO> CreateUserLoans(int n)
-        {
-            var loans = new List<UserLoanDTO>();
-
-            for (int i = 0; i < n; i++)
-            {
-                var ID = i + 1;
-
-                var loan = new UserLoanDTO
-                {
-                    Book = new BookDTO
-                    {
-                        ID = 1,
-                        Title = String.Format("Book {0}", ID),
-                        Author = String.Format("Author {0}", ID),
-                        PublishDate = new DateTime(2000 + ID, 1, 1),
-                        ISBN = String.Format("ISBN {0}", ID),
-                    },
-                    LoanDate = new DateTime(2010 + ID, 1, 1),
-                    ReturnDate = (i % 2 == 0 ? (DateTime?)new DateTime(2010 + ID, 3, 1) : null)
-                };
-
-                loans.Add(loan);
-            }
-
-            return loans;
-        }
-
-        private Envelope<UserLoanDTO> CreateUsersLoansEnvelope(List<UserLoanDTO> loans, int pageNumber, int? pageSize)
-        {
-            var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
-            var totalNumberOfItems = loans.Count;
-            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
-
-            var users = loans.Skip((pageNumber - 1) * maxSize).Take(maxSize);
-
-            return new Envelope<UserLoanDTO>
-            {
-                Items = loans,
-                Paging = new Paging
-                {
-                    PageCount = pageCount,
-                    PageSize = loans.Count(),
-                    PageMaxSize = maxSize,
-                    PageNumber = pageNumber,
-                    TotalNumberOfItems = totalNumberOfItems,
-                }
-            };
         }
     }
 }

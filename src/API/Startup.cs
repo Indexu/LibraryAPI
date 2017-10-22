@@ -50,7 +50,6 @@ namespace LibraryAPI.API
             services.AddTransient<IBookService, BookService>();
 
             services.AddTransient<ILoanRepository, LoanRepository>();
-            services.AddTransient<ILoanService, LoanService>();
 
             services.AddTransient<IReviewRepository, ReviewRepository>();
             services.AddTransient<IReviewService, ReviewService>();
