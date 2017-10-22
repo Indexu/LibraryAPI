@@ -19,7 +19,7 @@ namespace LibraryAPI.Models.DTOModels
         /// What users have the book loaned
         /// </summary>
         /// <value>
-        /// The UserLoans property is the UserLoanDTO collection value of what books the user has
+        /// The BookLoans property is the BookLoanDTO collection value of what user have gotten the book loaned
         /// </value>
         public IEnumerable<BookLoanDTO> BookLoans { get; set; }
     }

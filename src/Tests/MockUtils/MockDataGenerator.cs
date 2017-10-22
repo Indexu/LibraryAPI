@@ -294,6 +294,33 @@ namespace LibraryAPI.Tests.MockUtils
             };
         }
 
+        public static UserReportDTO CreateUserReport(int userID, int n)
+        {
+            return new UserReportDTO
+            {
+                User = CreateUser(userID),
+                UserLoans = CreateUserLoans(n)
+            };
+        }
+
+        public static BookReportDTO CreateBookReport(int bookID, int n)
+        {
+            return new BookReportDTO
+            {
+                Book = CreateBook(bookID),
+                BookLoans = CreateBookLoans(n)
+            };
+        }
+
+        public static RecommendationDTO CreateRecommendation(int bookID, double? averageRating)
+        {
+            return new RecommendationDTO
+            {
+                Book = CreateBook(bookID),
+                AverageRating = averageRating
+            };
+        }
+
         public static ReviewViewModel CreateReviewViewModel(int rating)
         {
             return new ReviewViewModel
@@ -396,6 +423,54 @@ namespace LibraryAPI.Tests.MockUtils
             }
 
             return userReviews;
+        }
+
+        public static IEnumerable<UserReportDTO> CreateUserReports(int n)
+        {
+            var reports = new List<UserReportDTO>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+
+                var report = CreateUserReport(ID, rand.Next(1, 10));
+
+                reports.Add(report);
+            }
+
+            return reports;
+        }
+
+        public static IEnumerable<BookReportDTO> CreateBookReports(int n)
+        {
+            var reports = new List<BookReportDTO>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+
+                var report = CreateBookReport(ID, rand.Next(1, 10));
+
+                reports.Add(report);
+            }
+
+            return reports;
+        }
+
+        public static IEnumerable<RecommendationDTO> CreateRecommendations(int n)
+        {
+            var recommendations = new List<RecommendationDTO>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+
+                var recommendation = CreateRecommendation(ID, (rand.NextDouble() * 5));
+
+                recommendations.Add(recommendation);
+            }
+
+            return recommendations;
         }
 
         public static Envelope<BookReviewDTO> CreateBookReviewEnvelope(IEnumerable<BookReviewDTO> bookReviews, int pageNumber, int? pageSize)
@@ -501,6 +576,72 @@ namespace LibraryAPI.Tests.MockUtils
                 {
                     PageCount = pageCount,
                     PageSize = selectedLoans.Count(),
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
+        public static Envelope<UserReportDTO> CreateUserReportsEnvelope(IEnumerable<UserReportDTO> reports, int pageNumber, int? pageSize)
+        {
+            var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
+            var totalNumberOfItems = reports.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var selectedReports = reports.Skip((pageNumber - 1) * maxSize).Take(maxSize);
+
+            return new Envelope<UserReportDTO>
+            {
+                Items = selectedReports,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = selectedReports.Count(),
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
+        public static Envelope<BookReportDTO> CreateBookReportsEnvelope(IEnumerable<BookReportDTO> reports, int pageNumber, int? pageSize)
+        {
+            var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
+            var totalNumberOfItems = reports.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var selectedReports = reports.Skip((pageNumber - 1) * maxSize).Take(maxSize);
+
+            return new Envelope<BookReportDTO>
+            {
+                Items = selectedReports,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = selectedReports.Count(),
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
+        public static Envelope<RecommendationDTO> CreateRecommendationsEnvelope(IEnumerable<RecommendationDTO> recommendations, int pageNumber, int? pageSize)
+        {
+            var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
+            var totalNumberOfItems = recommendations.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var selectedRecommendations = recommendations.Skip((pageNumber - 1) * maxSize).Take(maxSize);
+
+            return new Envelope<RecommendationDTO>
+            {
+                Items = selectedRecommendations,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = selectedRecommendations.Count(),
                     PageMaxSize = maxSize,
                     PageNumber = pageNumber,
                     TotalNumberOfItems = totalNumberOfItems,
