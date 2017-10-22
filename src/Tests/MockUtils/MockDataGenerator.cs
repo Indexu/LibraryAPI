@@ -26,6 +26,21 @@ namespace LibraryAPI.Tests.MockUtils
             return users;
         }
 
+        public static List<BookDTO> CreateBooks(int n)
+        {
+            var books = new List<BookDTO>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+                var book = CreateBook(ID);
+
+                books.Add(book);
+            }
+
+            return books;
+        }
+
         public static Envelope<UserDTO> CreateUsersEnvelope(IEnumerable<UserDTO> users, int pageNumber, int? pageSize)
         {
             var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
@@ -108,6 +123,16 @@ namespace LibraryAPI.Tests.MockUtils
             return userDetails;
         }
 
+        public static UserLoanDTO CreateUserLoan(int bookID, DateTime loanDate, DateTime? returnDate)
+        {
+            return new UserLoanDTO
+            {
+                Book = CreateBook(bookID),
+                LoanDate = loanDate,
+                ReturnDate = returnDate
+            };
+        }
+
         public static List<UserLoanDTO> CreateUserLoans(int n)
         {
             var loans = new List<UserLoanDTO>();
@@ -116,12 +141,7 @@ namespace LibraryAPI.Tests.MockUtils
             {
                 var ID = i + 1;
 
-                var loan = new UserLoanDTO
-                {
-                    Book = CreateBook(1),
-                    LoanDate = new DateTime(2010 + ID, 1, 1),
-                    ReturnDate = (i % 2 == 0 ? (DateTime?)new DateTime(2010 + ID, 3, 1) : null)
-                };
+                var loan = CreateUserLoan(ID, new DateTime(2010 + ID, 1, 1), (i % 2 == 0 ? (DateTime?)new DateTime(2010 + ID, 3, 1) : null));
 
                 loans.Add(loan);
             }
@@ -151,6 +171,94 @@ namespace LibraryAPI.Tests.MockUtils
             };
         }
 
+        public static BookLoanDTO CreateBookLoan(int userID, DateTime loanDate, DateTime? returnDate)
+        {
+            return new BookLoanDTO
+            {
+                User = CreateUser(userID),
+                LoanDate = loanDate,
+                ReturnDate = returnDate
+            };
+        }
+
+        public static List<BookLoanDTO> CreateBookLoans(int n)
+        {
+            var loans = new List<BookLoanDTO>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+
+                var loan = CreateBookLoan(ID, new DateTime(2010 + ID, 1, 1), (i % 2 == 0 ? (DateTime?)new DateTime(2010 + ID, 3, 1) : null));
+
+                loans.Add(loan);
+            }
+
+            return loans;
+        }
+
+        public static Envelope<BookLoanDTO> CreateBookLoansEnvelope(IEnumerable<BookLoanDTO> loans, int pageNumber, int? pageSize)
+        {
+            var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
+            var totalNumberOfItems = loans.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var users = loans.Skip((pageNumber - 1) * maxSize).Take(maxSize);
+
+            return new Envelope<BookLoanDTO>
+            {
+                Items = loans,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = loans.Count(),
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
+        public static PatchLoanViewModel CreatePatchLoanViewModel(DateTime loanDate, DateTime? returnDate)
+        {
+            return new PatchLoanViewModel
+            {
+                LoanDate = loanDate,
+                ReturnDate = returnDate
+            };
+        }
+
+        public static LoanViewModel CreateLoanViewModel(DateTime loanDate, DateTime? returnDate)
+        {
+            return new LoanViewModel
+            {
+                LoanDate = loanDate,
+                ReturnDate = returnDate
+            };
+        }
+
+        public static PatchBookViewModel CreatePatchBookViewModel(int bookID)
+        {
+            return new PatchBookViewModel
+            {
+                Title = String.Format("Book {0}", bookID),
+                Author = String.Format("Author {0}", bookID),
+                PublishDate = new DateTime(2000 + bookID, 1, 1),
+                ISBN = String.Format("ISBN {0}", bookID),
+            };
+        }
+
+        public static BookViewModel CreateBookViewModel(int bookID)
+        {
+            return new BookViewModel
+            {
+                Title = String.Format("Book {0}", bookID),
+                Author = String.Format("Author {0}", bookID),
+                PublishDate = new DateTime(2000 + bookID, 1, 1),
+                ISBN = String.Format("ISBN {0}", bookID),
+            };
+        }
+
         public static BookDTO CreateBook(int bookID)
         {
             return new BookDTO
@@ -160,6 +268,19 @@ namespace LibraryAPI.Tests.MockUtils
                 Author = String.Format("Author {0}", bookID),
                 PublishDate = new DateTime(2000 + bookID, 1, 1),
                 ISBN = String.Format("ISBN {0}", bookID),
+            };
+        }
+
+        public static BookDetailsDTO CreateBasicBookDetails(int bookID)
+        {
+            return new BookDetailsDTO
+            {
+                ID = 1,
+                Title = String.Format("Book {0}", bookID),
+                Author = String.Format("Author {0}", bookID),
+                PublishDate = new DateTime(2000 + bookID, 1, 1),
+                ISBN = String.Format("ISBN {0}", bookID),
+                LoanHistory = null
             };
         }
 
@@ -336,6 +457,50 @@ namespace LibraryAPI.Tests.MockUtils
                 {
                     PageCount = pageCount,
                     PageSize = selectedUserReviews.Count(),
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
+        public static Envelope<BookDTO> CreateBooksEnvelope(IEnumerable<BookDTO> books, int pageNumber, int? pageSize)
+        {
+            var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
+            var totalNumberOfItems = books.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var selectedBooks = books.Skip((pageNumber - 1) * maxSize).Take(maxSize);
+
+            return new Envelope<BookDTO>
+            {
+                Items = selectedBooks,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = selectedBooks.Count(),
+                    PageMaxSize = maxSize,
+                    PageNumber = pageNumber,
+                    TotalNumberOfItems = totalNumberOfItems,
+                }
+            };
+        }
+
+        public static Envelope<UserLoanDTO> CreateUserLoansEnvelope(IEnumerable<UserLoanDTO> userLoans, int pageNumber, int? pageSize)
+        {
+            var maxSize = (pageSize.HasValue ? pageSize.Value : 50);
+            var totalNumberOfItems = userLoans.Count();
+            var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
+
+            var selectedLoans = userLoans.Skip((pageNumber - 1) * maxSize).Take(maxSize);
+
+            return new Envelope<UserLoanDTO>
+            {
+                Items = selectedLoans,
+                Paging = new Paging
+                {
+                    PageCount = pageCount,
+                    PageSize = selectedLoans.Count(),
                     PageMaxSize = maxSize,
                     PageNumber = pageNumber,
                     TotalNumberOfItems = totalNumberOfItems,
