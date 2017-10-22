@@ -71,7 +71,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             return userDetailsDTO;
         }
 
-        public int AddUser(UserViewModel user)
+        public UserDTO AddUser(UserViewModel user)
         {
             // Check if exists by email
             if (db.Users.Where(u => u.Email == user.Email).Any())
@@ -85,7 +85,9 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             db.Users.Add(userEntity);
             db.SaveChanges();
 
-            return userEntity.ID;
+            var userDTO = mapper.Map<UserEntity, UserDTO>(userEntity);
+
+            return userDTO;
         }
 
         public void UpdateUser(int userID, UserViewModel user)

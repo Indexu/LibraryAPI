@@ -37,8 +37,8 @@ namespace LibraryAPI.Interfaces.Services
         /// </summary>
         /// <param name="user">The UserViewModel containing the user information</param>
         /// <para />
-        /// <returns>An integer representing the ID of the added user</returns>
-        int AddUser(UserViewModel user);
+        /// <returns>The newly created user as a UserDTO</returns>
+        UserDTO AddUser(UserViewModel user);
 
         /// <summary>
         /// Replace a user's information

@@ -52,7 +52,7 @@ namespace LibraryAPI.Services
             }
         }
 
-        public int AddUser(UserViewModel user)
+        public UserDTO AddUser(UserViewModel user)
         {
             try
             {

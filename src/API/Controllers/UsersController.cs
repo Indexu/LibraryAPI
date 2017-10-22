@@ -127,10 +127,9 @@ namespace LibraryAPI.API.Controllers
 
             try
             {
-                var userID = userService.AddUser(user);
-                var createdUser = userService.GetUserByID(userID, 1, null);
+                var createdUser = userService.AddUser(user);
 
-                return CreatedAtRoute("GetUserByID", new { userID = userID }, createdUser);
+                return CreatedAtRoute("GetUserByID", new { userID = createdUser.ID }, createdUser);
             }
             catch (AlreadyExistsException ex)
             {
