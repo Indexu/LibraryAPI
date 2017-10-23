@@ -80,7 +80,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             var reviewEntities = query.Skip((pageNumber - 1) * maxSize).Take(maxSize).ToList();
 
-            var userReviewDTOs = Mapper.Map<IList<ReviewEntity>, IList<UserReviewDTO>>(reviewEntities);
+            var userReviewDTOs = mapper.Map<IList<ReviewEntity>, IList<UserReviewDTO>>(reviewEntities);
 
             return new Envelope<UserReviewDTO>
             {
@@ -113,7 +113,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             var reviewEntities = query.Skip((pageNumber - 1) * maxSize).Take(maxSize).ToList();
 
-            var bookReviewDTOs = Mapper.Map<IList<ReviewEntity>, IList<BookReviewDTO>>(reviewEntities);
+            var bookReviewDTOs = mapper.Map<IList<ReviewEntity>, IList<BookReviewDTO>>(reviewEntities);
 
             return new Envelope<BookReviewDTO>
             {
@@ -155,24 +155,29 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
                 throw new NotFoundException("Review not found");
             }
 
-            var reviewDTO = Mapper.Map<ReviewEntity, ReviewDTO>(reviewEntity);
+            var reviewDTO = mapper.Map<ReviewEntity, ReviewDTO>(reviewEntity);
 
             return reviewDTO;
         }
 
         public ReviewDTO AddReview(int userID, int bookID, ReviewViewModel review)
         {
+            var user = db.Users.Where(u => u.ID == userID).SingleOrDefault();
+
             // Check if user exists
-            if (!db.Users.Where(u => u.ID == userID).Any())
+            if (user == null)
             {
                 throw new NotFoundException("User not found");
             }
 
+            var book = db.Books.Where(b => b.ID == bookID).SingleOrDefault();
+
             // Check if book exists
-            if (!db.Books.Where(b => b.ID == bookID).Any())
+            if (book == null)
             {
                 throw new NotFoundException("Book not found");
             }
+
 
             // Check if review already exists
             if (db.Reviews.Where(r => r.UserID == userID && r.BookID == bookID).Any())
@@ -188,10 +193,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             db.Reviews.Add(reviewEntity);
             db.SaveChanges();
 
-            var user = db.Users.Where(u => u.ID == userID).SingleOrDefault();
             var userDTO = mapper.Map<UserEntity, UserDTO>(user);
-
-            var book = db.Books.Where(b => b.ID == bookID).SingleOrDefault();
             var bookDTO = mapper.Map<BookEntity, BookDTO>(book);
 
             var reviewDTO = mapper.Map<ReviewEntity, ReviewDTO>(reviewEntity);
