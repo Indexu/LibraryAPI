@@ -42,6 +42,36 @@ namespace LibraryAPI.Tests.MockUtils
             return books;
         }
 
+        public static List<LoanEntity> CreateLoanEntities(int n)
+        {
+            var loans = new List<LoanEntity>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+                var loan = CreateLoanEntity(ID, ID, ID, new DateTime(2010 + ID, 1, 1), (i % 2 == 0 ? (DateTime?)new DateTime(2010 + ID, 3, 1) : null));
+
+                loans.Add(loan);
+            }
+
+            return loans;
+        }
+
+        public static List<ReviewEntity> CreateReviewEntities(int n)
+        {
+            var reviews = new List<ReviewEntity>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+                var review = CreateReviewEntity(ID, ID, ID, i % 6);
+
+                reviews.Add(review);
+            }
+
+            return reviews;
+        }
+
         public static List<UserDTO> CreateUsers(int n)
         {
             var users = new List<UserDTO>();
@@ -270,6 +300,18 @@ namespace LibraryAPI.Tests.MockUtils
             };
         }
 
+        public static LoanEntity CreateLoanEntity(int loanID, int userID, int bookID, DateTime loanDate, DateTime? returnDate)
+        {
+            return new LoanEntity
+            {
+                ID = loanID,
+                UserID = userID,
+                BookID = bookID,
+                LoanDate = loanDate,
+                ReturnDate = returnDate
+            };
+        }
+
         public static LoanViewModel CreateLoanViewModel(DateTime loanDate, DateTime? returnDate)
         {
             return new LoanViewModel
@@ -335,6 +377,17 @@ namespace LibraryAPI.Tests.MockUtils
                 PublishDate = new DateTime(2000 + bookID, 1, 1),
                 ISBN = String.Format("ISBN {0}", bookID),
                 LoanHistory = null
+            };
+        }
+
+        public static ReviewEntity CreateReviewEntity(int ID, int userID, int bookID, int rating)
+        {
+            return new ReviewEntity
+            {
+                ID = ID,
+                UserID = userID,
+                BookID = bookID,
+                Rating = rating
             };
         }
 
