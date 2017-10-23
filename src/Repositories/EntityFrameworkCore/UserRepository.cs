@@ -41,7 +41,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
                                 .Take(maxSize)
                                 .ToList();
 
-            var userDTOs = Mapper.Map<IList<UserEntity>, IList<UserDTO>>(userEntites);
+            var userDTOs = mapper.Map<IList<UserEntity>, IList<UserDTO>>(userEntites);
 
             return new Envelope<UserDTO>
             {
@@ -101,7 +101,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             }
 
             // Check if email change and make sure email is still unique
-            if (userEntity.Email != user.Email && db.Users.Where(u => u.Email == user.Email).Any())
+            if (userEntity.Email != user.Email && db.Users.Where(u => u.Email == user.Email && u.ID != userID).Any())
             {
                 throw new AlreadyExistsException(alreadyExistsMessage);
             }

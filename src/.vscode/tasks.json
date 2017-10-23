@@ -4,13 +4,19 @@
     "isShellCommand": true,
     "args": [],
     "tasks": [
-        {
-            "taskName": "build",
-            "args": [
-                "${workspaceRoot}/API/API.csproj"
-            ],
-            "isBuildCommand": true,
-            "problemMatcher": "$msCompile"
-        }
-    ]
+    {
+        "taskName": "build",
+        "args": [
+            "${workspaceRoot}/API/API.csproj"
+        ],
+        "isBuildCommand": true,
+        "problemMatcher": "$msCompile"
+    },
+    {
+        "taskName": "test",
+        "args": [
+            "${workspaceRoot}/Tests/Tests.csproj"
+        ],
+        "isBuildCommand": false
+    }]
 }

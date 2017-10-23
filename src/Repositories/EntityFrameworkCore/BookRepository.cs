@@ -30,7 +30,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             var bookEntities = db.Books.Skip((pageNumber - 1) * maxSize).Take(maxSize).ToList();
 
-            var bookDTOs = Mapper.Map<IList<BookEntity>, IList<BookDTO>>(bookEntities);
+            var bookDTOs = mapper.Map<IList<BookEntity>, IList<BookDTO>>(bookEntities);
 
             return new Envelope<BookDTO>
             {
@@ -55,7 +55,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
                 throw new NotFoundException(notFoundMessage);
             }
 
-            var bookDTO = Mapper.Map<BookEntity, BookDTO>(bookEntity);
+            var bookDTO = mapper.Map<BookEntity, BookDTO>(bookEntity);
 
             return bookDTO;
         }

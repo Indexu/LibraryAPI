@@ -1,6 +1,7 @@
 using LibraryAPI.Models.DTOModels;
 using LibraryAPI.Models;
 using LibraryAPI.Models.ViewModels;
+using LibraryAPI.Models.EntityModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,36 @@ namespace LibraryAPI.Tests.MockUtils
     public class MockDataGenerator
     {
         public static Random rand = new Random();
+
+        public static List<UserEntity> CreateUserEntities(int n)
+        {
+            var users = new List<UserEntity>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+                var user = CreateUserEntity(ID);
+
+                users.Add(user);
+            }
+
+            return users;
+        }
+
+        public static List<BookEntity> CreateBookEntities(int n)
+        {
+            var books = new List<BookEntity>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var ID = i + 1;
+                var book = CreateBookEntity(ID);
+
+                books.Add(book);
+            }
+
+            return books;
+        }
 
         public static List<UserDTO> CreateUsers(int n)
         {
@@ -66,6 +97,17 @@ namespace LibraryAPI.Tests.MockUtils
         public static UserDTO CreateUser(int userID)
         {
             return new UserDTO
+            {
+                ID = userID,
+                Name = String.Format("User {0}", userID),
+                Email = String.Format("user@user{0}.com", userID),
+                Address = String.Format("{0} Main Street", userID)
+            };
+        }
+
+        public static UserEntity CreateUserEntity(int userID)
+        {
+            return new UserEntity
             {
                 ID = userID,
                 Name = String.Format("User {0}", userID),
@@ -259,11 +301,23 @@ namespace LibraryAPI.Tests.MockUtils
             };
         }
 
+        public static BookEntity CreateBookEntity(int bookID)
+        {
+            return new BookEntity
+            {
+                ID = bookID,
+                Title = String.Format("Book {0}", bookID),
+                Author = String.Format("Author {0}", bookID),
+                PublishDate = new DateTime(2000 + bookID, 1, 1),
+                ISBN = String.Format("ISBN {0}", bookID),
+            };
+        }
+
         public static BookDTO CreateBook(int bookID)
         {
             return new BookDTO
             {
-                ID = 1,
+                ID = bookID,
                 Title = String.Format("Book {0}", bookID),
                 Author = String.Format("Author {0}", bookID),
                 PublishDate = new DateTime(2000 + bookID, 1, 1),
