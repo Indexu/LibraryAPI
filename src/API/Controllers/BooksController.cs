@@ -110,7 +110,7 @@ namespace LibraryAPI.API.Controllers
             {
                 var error = new ErrorDTO
                 {
-                    Code = 400,
+                    Code = 412,
                     Message = "Validation error. Invalid input"
                 };
 
@@ -153,7 +153,7 @@ namespace LibraryAPI.API.Controllers
             {
                 var error = new ErrorDTO
                 {
-                    Code = 400,
+                    Code = 412,
                     Message = "Validation error. Invalid input"
                 };
 
@@ -206,7 +206,7 @@ namespace LibraryAPI.API.Controllers
             {
                 var error = new ErrorDTO
                 {
-                    Code = 400,
+                    Code = 412,
                     Message = "Validation error. Invalid input"
                 };
 
@@ -291,7 +291,7 @@ namespace LibraryAPI.API.Controllers
 
         // GET api/v1/books/reviews
         [HttpGet("reviews")]
-        public IActionResult GetBookReviewsByID([FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
+        public IActionResult GetBookReviews([FromQuery] int pageNumber = 1, [FromQuery] int? pageSize = null)
         {
             try
             {

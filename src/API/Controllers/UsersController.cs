@@ -335,7 +335,7 @@ namespace LibraryAPI.API.Controllers
         {
             try
             {
-                var books = bookService.AddLoan(userID, bookID);
+                bookService.AddLoan(userID, bookID);
 
                 return CreatedAtRoute("GetUserBooks", new { userID = userID }, null);
             }
