@@ -23,9 +23,6 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
     /// </summary>
     public class BookRepository : AbstractRepository, IBookRepository
     {
-        private const string notFoundMessage = "Book not found";
-        private const string alreadyExistsMessage = "Book with that ISBN already exists";
-
         public BookRepository(DatabaseContext db, IMapper mapper)
             : base(db, mapper)
         {
@@ -61,7 +58,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             if (bookEntity == null)
             {
-                throw new NotFoundException(notFoundMessage);
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             var bookDTO = mapper.Map<BookEntity, BookDTO>(bookEntity);
@@ -74,7 +71,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if exists by ISBN
             if (db.Books.Where(b => b.ISBN == book.ISBN).Any())
             {
-                throw new AlreadyExistsException(alreadyExistsMessage);
+                throw new AlreadyExistsException(bookAlreadyExistsMessage);
             }
 
             // Add book
@@ -95,13 +92,13 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             if (bookEntity == null)
             {
-                throw new NotFoundException(notFoundMessage);
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             // Check if ISBN change and make sure ISBN is still unique
             if (bookEntity.ISBN != book.ISBN && db.Books.Where(b => b.ISBN == book.ISBN).Any())
             {
-                throw new AlreadyExistsException(alreadyExistsMessage);
+                throw new AlreadyExistsException(bookAlreadyExistsMessage);
             }
 
             bookEntity.Title = book.Title;
@@ -119,7 +116,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             if (bookEntity == null)
             {
-                throw new NotFoundException(notFoundMessage);
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             db.Books.Remove(bookEntity);

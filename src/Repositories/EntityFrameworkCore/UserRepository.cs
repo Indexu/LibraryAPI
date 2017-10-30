@@ -29,9 +29,6 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
     {
         private readonly ILoanRepository loanRepository;
 
-        private const string notFoundMessage = "User not found";
-        private const string alreadyExistsMessage = "User with that email already exists";
-
         public UserRepository(DatabaseContext db, IMapper mapper, ILoanRepository loanRepository)
             : base(db, mapper)
         {
@@ -72,7 +69,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             if (userEntity == null)
             {
-                throw new NotFoundException(notFoundMessage);
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             var userDetailsDTO = mapper.Map<UserEntity, UserDTO>(userEntity);
@@ -85,7 +82,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if exists by email
             if (db.Users.Where(u => u.Email == user.Email).Any())
             {
-                throw new AlreadyExistsException(alreadyExistsMessage);
+                throw new AlreadyExistsException(userAlreadyExistsMessage);
             }
 
             // Add user
@@ -106,13 +103,13 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             if (userEntity == null)
             {
-                throw new NotFoundException(notFoundMessage);
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             // Check if email change and make sure email is still unique
             if (userEntity.Email != user.Email && db.Users.Where(u => u.Email == user.Email && u.ID != userID).Any())
             {
-                throw new AlreadyExistsException(alreadyExistsMessage);
+                throw new AlreadyExistsException(userAlreadyExistsMessage);
             }
 
             userEntity.Name = user.Name;
@@ -129,7 +126,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             if (userEntity == null)
             {
-                throw new NotFoundException(notFoundMessage);
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             db.Users.Remove(userEntity);

@@ -24,9 +24,6 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
     /// </summary>
     public class ReviewRepository : AbstractRepository, IReviewRepository
     {
-        private const string notFoundMessage = "Review not found";
-        private const string alreadyExistsMessage = "Review already exists";
-
         public ReviewRepository(DatabaseContext db, IMapper mapper)
             : base(db, mapper)
         {
@@ -77,7 +74,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (!db.Users.Where(u => u.ID == userID).Any())
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
@@ -110,7 +107,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if book exists
             if (!db.Books.Where(b => b.ID == bookID).Any())
             {
-                throw new NotFoundException("Book not found");
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
@@ -143,13 +140,13 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (!db.Users.Where(u => u.ID == userID).Any())
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             // Check if book exists
             if (!db.Books.Where(b => b.ID == bookID).Any())
             {
-                throw new NotFoundException("Book not found");
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             // Get review from database
@@ -161,7 +158,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             if (reviewEntity == null)
             {
-                throw new NotFoundException("Review not found");
+                throw new NotFoundException(reviewNotFoundMessage);
             }
 
             var reviewDTO = mapper.Map<ReviewEntity, ReviewDTO>(reviewEntity);
@@ -176,7 +173,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (user == null)
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             var book = db.Books.Where(b => b.ID == bookID).SingleOrDefault();
@@ -184,14 +181,14 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if book exists
             if (book == null)
             {
-                throw new NotFoundException("Book not found");
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
 
             // Check if review already exists
             if (db.Reviews.Where(r => r.UserID == userID && r.BookID == bookID).Any())
             {
-                throw new AlreadyExistsException(alreadyExistsMessage);
+                throw new AlreadyExistsException(reviewAlreadyExistsMessage);
             }
 
             // Add review
@@ -217,13 +214,13 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (!db.Users.Where(u => u.ID == userID).Any())
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             // Check if book exists
             if (!db.Books.Where(b => b.ID == bookID).Any())
             {
-                throw new NotFoundException("Book not found");
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             // Get entity from DB
@@ -232,7 +229,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if review exists
             if (reviewEntity == null)
             {
-                throw new NotFoundException("Review not found");
+                throw new NotFoundException(reviewNotFoundMessage);
             }
 
             // Change rating
@@ -250,13 +247,13 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (!db.Users.Where(u => u.ID == userID).Any())
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             // Check if book exists
             if (!db.Books.Where(b => b.ID == bookID).Any())
             {
-                throw new NotFoundException("Book not found");
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             // Get entity from DB
@@ -265,7 +262,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if review exists
             if (reviewEntity == null)
             {
-                throw new NotFoundException("Review not found");
+                throw new NotFoundException(reviewNotFoundMessage);
             }
 
             db.Reviews.Remove(reviewEntity);
@@ -277,7 +274,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (!db.Users.Where(u => u.ID == userID).Any())
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);

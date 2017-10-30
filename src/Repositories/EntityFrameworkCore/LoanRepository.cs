@@ -23,10 +23,6 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
     /// </summary>
     public class LoanRepository : AbstractRepository, ILoanRepository
     {
-        private const string notFoundMessage = "Loan not found";
-        private const string alreadyExistsMessage = "Loan already exists";
-        private const string dateNonsenseMessage = "Loan date must be before the return date";
-
         public LoanRepository(DatabaseContext db, IMapper mapper)
             : base(db, mapper)
         {
@@ -103,19 +99,19 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (!db.Users.Where(u => u.ID == userID).Any())
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             // Check if book exists
             if (!db.Books.Where(b => b.ID == bookID).Any())
             {
-                throw new NotFoundException("Book not found");
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             // Check if user already has book loaned
             if (db.Loans.Where(l => l.BookID == bookID && l.UserID == userID && l.ReturnDate == null).Any())
             {
-                throw new AlreadyExistsException("User already has book loaned");
+                throw new AlreadyExistsException(loanAlreadyExistsMessage);
             }
 
             var loanEntity = new LoanEntity
@@ -138,13 +134,13 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (!db.Users.Where(u => u.ID == userID).Any())
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             // Check if book exists
             if (!db.Books.Where(b => b.ID == bookID).Any())
             {
-                throw new NotFoundException("Book not found");
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             var loanEntity = db.Loans
@@ -154,7 +150,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user doesn't have the book loaned
             if (loanEntity == null)
             {
-                throw new NotFoundException("User does not have the book loaned");
+                throw new NotFoundException(loanNotFoundMessage);
             }
 
             loanEntity.ReturnDate = DateTime.Now;
@@ -284,13 +280,13 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             // Check if user exists
             if (!db.Users.Where(u => u.ID == userID).Any())
             {
-                throw new NotFoundException("User not found");
+                throw new NotFoundException(userNotFoundMessage);
             }
 
             // Check if book exists
             if (!db.Books.Where(b => b.ID == bookID).Any())
             {
-                throw new NotFoundException("Book not found");
+                throw new NotFoundException(bookNotFoundMessage);
             }
 
             // Get entity from database
@@ -300,7 +296,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             if (loanEntity == null)
             {
-                throw new NotFoundException("User does not have the book loaned");
+                throw new NotFoundException(loanNotFoundMessage);
             }
 
             // Check if loan date is before return date
