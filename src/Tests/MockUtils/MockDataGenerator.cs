@@ -8,6 +8,16 @@ using System.Linq;
 
 namespace LibraryAPI.Tests.MockUtils
 {
+    /// <summary>
+    /// A class with methods to generate models and entities
+    /// for unit testing
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
+    /// </summary>
     public class MockDataGenerator
     {
         public static Random rand = new Random();

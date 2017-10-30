@@ -7,7 +7,13 @@ using System;
 namespace LibraryAPI.Interfaces.Services
 {
     /// <summary>
-    /// An interface detailing the operations of the reporting service
+    /// An interface detailing the reporting service
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public interface IReportingService
     {

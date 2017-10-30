@@ -4,6 +4,12 @@ namespace LibraryAPI.Models.EntityModels
 {
     /// <summary>
     /// An entity class for a user entry in the database
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public class UserEntity
     {

@@ -4,7 +4,13 @@ using LibraryAPI.Models.EntityModels;
 namespace LibraryAPI.Repositories.EntityFrameworkCore
 {
     /// <summary>
-    /// A DbContext for the SQL database
+    /// A DbContext for the SQL database using Entity Framework Core
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public class DatabaseContext : DbContext
     {

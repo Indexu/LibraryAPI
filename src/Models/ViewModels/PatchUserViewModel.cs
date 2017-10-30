@@ -3,7 +3,13 @@ using System.ComponentModel.DataAnnotations;
 namespace LibraryAPI.Models.ViewModels
 {
     /// <summary>
-    /// A POCO class for recieving user input for a User PATCH
+    /// A POCO class for recieving user input for a user PATCH
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public class PatchUserViewModel
     {
@@ -37,16 +43,5 @@ namespace LibraryAPI.Models.ViewModels
         /// </value>
         [EmailAddress]
         public string Email { get; set; }
-
-        /// <summary>
-        /// The phone number of the user
-        /// </summary>
-        /// <value>
-        /// The Phone property is the string value of the user's phone number
-        /// <para />
-        /// Example: 5812345
-        /// </value>
-        [RegularExpression("^[0-9]*$")]
-        public string Phone { get; set; }
     }
 }

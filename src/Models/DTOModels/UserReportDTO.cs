@@ -3,7 +3,13 @@ using System.Collections.Generic;
 namespace LibraryAPI.Models.DTOModels
 {
     /// <summary>
-    /// A DTO (data transfer object) for a user report entry
+    /// A DTO (data transfer object) for a user report entity
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public class UserReportDTO
     {

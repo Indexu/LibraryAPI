@@ -4,7 +4,13 @@ using System.ComponentModel.DataAnnotations;
 namespace LibraryAPI.Models.ViewModels
 {
     /// <summary>
-    /// A POCO class for recieving user input for a Review
+    /// A POCO class for recieving user input for a review PATCH
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public class PatchReviewViewModel
     {

@@ -3,7 +3,13 @@ using System.ComponentModel.DataAnnotations;
 namespace LibraryAPI.Models.ViewModels
 {
     /// <summary>
-    /// A POCO class for recieving user input for a User
+    /// A POCO class for recieving user input for a user
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public class UserViewModel
     {

@@ -6,7 +6,13 @@ using LibraryAPI.Models;
 namespace LibraryAPI.Interfaces.Services
 {
     /// <summary>
-    /// An interface detailing the operations of the user service
+    /// An interface detailing the user service
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public interface IUserService
     {

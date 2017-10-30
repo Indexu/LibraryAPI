@@ -12,6 +12,15 @@ using AutoMapper;
 
 namespace LibraryAPI.API.Controllers
 {
+    /// <summary>
+    /// A controller for routes starting with /books
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class BooksController : Controller

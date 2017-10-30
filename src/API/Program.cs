@@ -10,6 +10,15 @@ using Microsoft.Extensions.Logging;
 
 namespace LibraryAPI.API
 {
+    /// <summary>
+    /// The starting point of the API
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
+    /// </summary>
     public class Program
     {
         public static void Main(string[] args)

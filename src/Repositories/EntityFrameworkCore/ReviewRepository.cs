@@ -13,6 +13,15 @@ using System.Data.Common;
 
 namespace LibraryAPI.Repositories.EntityFrameworkCore
 {
+    /// <summary>
+    /// An implementation of the review repository using Entity Framework Core
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
+    /// </summary>
     public class ReviewRepository : AbstractRepository, IReviewRepository
     {
         private const string notFoundMessage = "Review not found";

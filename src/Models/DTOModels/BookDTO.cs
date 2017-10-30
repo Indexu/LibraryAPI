@@ -5,6 +5,12 @@ namespace LibraryAPI.Models.DTOModels
 {
     /// <summary>
     /// A DTO (data transfer object) for a book
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public class BookDTO
     {

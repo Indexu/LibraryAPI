@@ -3,7 +3,13 @@ using System;
 namespace LibraryAPI.Models.DTOModels
 {
     /// <summary>
-    /// A DTO (data transfer object) for a review for a book
+    /// A DTO (data transfer object) for a review of a book
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public class BookReviewDTO
     {

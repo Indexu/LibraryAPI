@@ -7,6 +7,12 @@ namespace LibraryAPI.Interfaces.Repositories
 {
     /// <summary>
     /// An interface detailing the book repository
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
     /// </summary>
     public interface IBookRepository
     {

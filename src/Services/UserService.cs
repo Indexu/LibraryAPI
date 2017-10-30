@@ -10,6 +10,15 @@ using AutoMapper;
 
 namespace LibraryAPI.Services
 {
+    /// <summary>
+    /// An implementation of the user service
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
+    /// </summary>
     public class UserService : AbstractService, IUserService
     {
         private readonly IUserRepository userRepository;

@@ -16,6 +16,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryAPI.Tests.Services
 {
+    /// <summary>
+    /// The unit tests for the BooksController
+    /// 
+    /// Author: Hilmar Tryggvason
+    /// 
+    /// Version: 1.0, 30 Oct 2017
+    /// 
+    /// License: MIT License (https://opensource.org/licenses/MIT)
+    /// </summary>
     [TestClass]
     public class BooksControllerTests
     {
