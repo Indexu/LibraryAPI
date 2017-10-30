@@ -67,7 +67,7 @@ namespace LibraryAPI.API
             services.AddTransient<IReportingService, ReportingService>();
             services.AddTransient<IRecommendationService, RecommendationService>();
 
-            // Database info
+            // Database info and suppress warnings (known bug in EntityFrameworkCore)
             services.AddDbContext<DatabaseContext>(options =>
                 options
                     .UseSqlite("Data Source=../Repositories/LibraryAPI.db", db => db.MigrationsAssembly("API"))
