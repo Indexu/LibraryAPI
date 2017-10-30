@@ -79,7 +79,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
 
-            var query = db.Reviews.Include(r => r.Book).Where(r => r.UserID == userID);
+            var query = db.Reviews.Include(r => r.Book).Where(r => r.UserID == userID).OrderBy(r => r.ID);
 
             var totalNumberOfItems = query.Count();
             var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
@@ -112,7 +112,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
 
             var maxSize = (pageMaxSize.HasValue ? pageMaxSize.Value : defaultPageSize);
 
-            var query = db.Reviews.Include(r => r.User).Where(r => r.BookID == bookID);
+            var query = db.Reviews.Include(r => r.User).Where(r => r.BookID == bookID).OrderBy(r => r.ID);
 
             var totalNumberOfItems = query.Count();
             var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);

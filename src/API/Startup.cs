@@ -16,6 +16,7 @@ using LibraryAPI.Interfaces.Repositories;
 using LibraryAPI.Interfaces.Services;
 using LibraryAPI.Repositories.EntityFrameworkCore;
 using LibraryAPI.Services;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace LibraryAPI.API
 {
@@ -68,7 +69,11 @@ namespace LibraryAPI.API
 
             // Database info
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseSqlite("Data Source=../Repositories/LibraryAPI.db", db => db.MigrationsAssembly("API")));
+                options
+                    .UseSqlite("Data Source=../Repositories/LibraryAPI.db", db => db.MigrationsAssembly("API"))
+                    .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.QueryClientEvaluationWarning))
+                    .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

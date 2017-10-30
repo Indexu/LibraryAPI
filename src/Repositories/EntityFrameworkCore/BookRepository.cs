@@ -34,7 +34,7 @@ namespace LibraryAPI.Repositories.EntityFrameworkCore
             var totalNumberOfItems = db.Books.Count();
             var pageCount = (int)Math.Ceiling(totalNumberOfItems / (double)maxSize);
 
-            var bookEntities = db.Books.Skip((pageNumber - 1) * maxSize).Take(maxSize).ToList();
+            var bookEntities = db.Books.OrderBy(b => b.ID).Skip((pageNumber - 1) * maxSize).Take(maxSize).ToList();
 
             var bookDTOs = mapper.Map<IList<BookEntity>, IList<BookDTO>>(bookEntities);
 
