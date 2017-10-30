@@ -95,7 +95,7 @@ Testing took way more time than I thought and had little time to do any extravag
 ## Built With
 
 * [Visual Studio Code](https://code.visualstudio.com/)
-* [DotNet Core](https://www.microsoft.com/net/core)
+* [DotNet Core 2.0](https://www.microsoft.com/net/core)
 * [Entity Framework Core](https://github.com/aspnet/EntityFrameworkCore)
 * [SQLite](https://www.sqlite.org/)
 * [Postman](https://www.getpostman.com/)
